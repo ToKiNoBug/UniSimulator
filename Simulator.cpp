@@ -66,3 +66,12 @@ std::cerr<<"size of T.sum(Eigen::array<int,1>({1}))=["<<temp.NumDimensions<<std:
 dy.second=temp;
 return true;
 }
+
+
+#if DIM_COUNT <=0
+DIM_COUNT_should_be_a_positive_integer
+#endif
+
+#if BODY_COUNT <2
+BODY_COUNT_should_be_a_positive_integer_no_less_than_2
+#endif
