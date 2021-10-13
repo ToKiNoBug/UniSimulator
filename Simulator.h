@@ -33,7 +33,7 @@ typedef Eigen::TensorFixedSize<double,
                         Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Velocity;
 
 typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Accelerate;
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Acceleration;
 
 typedef Eigen::TensorFixedSize<double,
                         Eigen::Sizes<DIM_COUNT,BODY_COUNT,BODY_COUNT>> Interaction;
@@ -60,6 +60,8 @@ public:
     static void calculateSafeDistance(const MassVector &,
                                                             DistanceMat & dest);
 
+    static void calculateGM(const MassVector &,
+                                                            Interaction &);
     static bool calculateDiff(const Statue & y,
                              const Interaction &,
                              const DistanceMat &,

@@ -11,6 +11,7 @@ const double rs=0.5*std::pow(2*G*Ms/(omega_s*omega_s),1.0/3);
 const double vs=omega_s*rs;
 const double as=omega_s*vs;
 const double TimeMax=300*year;
+const double INF=1e300;
 
 Simulator::Simulator() {
 sol.clear();
@@ -26,6 +27,35 @@ void Simulator::calculateSafeDistance(const MassVector & mass,
     dest=2.44*massMat.max(massMat.transpose());
 }
 
+void Simulator::calculateGM(const MassVector & mass,
+                           Interaction & GM) {
+
+
+    //GM.setRandom();
+
+    //std::cerr<<"the 2nd dim has "<<GM.dimension(1)<<" dims\n";
+    //auto dims=GM.dimensions();
+    //std::cerr<<"size of GM is "<<dims[0]<<" , "<<dims[1]<<" , "<<dims[2]<<"\n";
+
+
+    //int j=1;
+    //Eigen::Tensor<double,2> subGM=GM.chip(j,1);
+
+    //std::cerr<<"GM=\n";
+    //std::cerr<<GM<<std::endl;
+
+    //std::cerr<<"subGM=\n";
+    //std::cerr<<subGM<<std::endl;
+
+for(int i=0;i<GM.dimension(1);i++) {
+    //std::cerr<<"i="<<i<<std::endl;
+    //std::cerr<<GM.chip(i,1)<<std::endl;
+    GM.chip(i,1).setConstant(G*mass(i));
+    //std::cerr<<GM.chip(i,1)<<std::endl;
+}
+//std::cerr<<"caculate finished\n";
+}
+
 bool Simulator::calculateDiff(const Statue & y,
                              const Interaction & GM,
                              const DistanceMat & safeDistance,
@@ -35,19 +65,24 @@ T.setZero();
 
 DistanceMat realDistance;
 
-realDistance.setZero();
+realDistance.setConstant(INF);
 
 for(uint16_t i=0;i<BODY_COUNT;i++) {
     for(uint16_t j=i+1;j<BODY_COUNT;j++) {
-        Eigen::TensorFixedSize<double,Eigen::Sizes<DIM_COUNT>>
-                delta_r=y.first.chip(i,0)-y.first.chip(j,0);
-        Eigen::TensorFixedSize<double,Eigen::Sizes<1>> distanceT=delta_r.square().sum();
+
+        /*Eigen::Tensor<double,1> temp=y.first.chip(i,1);
+
+        std::cerr<<"size of y.first.chip(0,1)=["<<temp.dimension(0)<<"]\n";*/
+
+        auto delta_r=y.first.chip(i,1)-y.first.chip(j,1);
+        Eigen::Tensor<double,0> distanceT=delta_r.square().sum();
         double && distance= std::move(distanceT(0));
 
         realDistance(i,j)=distance;
         realDistance(j,i)=distance;
-
+        std::cerr<<"i="<<i<<", j="<<j<<std::endl;
         T.chip(j,2).chip(i,1)=delta_r/(std::sqrt(distance)*distance);
+        T.chip(i,2).chip(j,1)=-T.chip(j,2).chip(i,1);
     }
 }
 
@@ -59,11 +94,7 @@ T*=GM;
 
 //dy.first=y.second;
 
-auto temp=T.sum(Eigen::array<int,1>({1}));
-
-std::cerr<<"size of T.sum(Eigen::array<int,1>({1}))=["<<temp.NumDimensions<<std::endl;
-
-dy.second=temp;
+dy.second=T.sum(Eigen::array<int,1>({1}));
 return true;
 }
 
