@@ -1,0 +1,74 @@
+#ifndef SIMULATOR_H
+#define SIMULATOR_H
+
+#include <iostream>
+#include <cmath>
+#include <list>
+#include <vector>
+
+//#define EIGEN_NO_DEBUG
+
+#include <Eigen/Dense>
+#include <unsupported/Eigen/CXX11/Tensor>
+
+#define DIM_COUNT 1
+#define BODY_COUNT 2
+
+extern const double G;
+extern const double Ms;
+extern const double omega_s;
+extern const double rho;
+extern const double year;
+extern const double rs;
+extern const double vs;
+extern const double as;
+extern const double TimeMax;
+
+//typedef Eigen::TensorFixedSize<double,Eigen::Sizes<DimCount,BodyCount>> Position;
+
+typedef Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Position;
+
+typedef Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Velocity;
+
+typedef Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Accelerate;
+
+typedef Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT,BODY_COUNT>> Interaction;
+
+typedef double Time ;
+
+typedef Eigen::Array<double,BODY_COUNT,1> MassVector ;
+
+typedef Eigen::Array<double,BODY_COUNT,BODY_COUNT> DistanceMat ;
+
+typedef std::pair<Position,Velocity> Statue ;
+
+typedef std::pair<Time,Statue> Point ;
+
+class Simulator
+{
+public:
+    Simulator();
+
+    void simulate(const Statue &);
+
+    const std::list<Point> & getResult() const;
+
+    static void calculateSafeDistance(const MassVector &,
+                                                            DistanceMat & dest);
+
+    static bool calculateDiff(const Statue & y,
+                             const Interaction &,
+                             const DistanceMat &,
+                             Statue & dy); //To avoid useless deep copying, dy.first will not be used.
+
+private:
+    std::list<Point> sol;
+
+
+};
+
+#endif // SIMULATOR_H

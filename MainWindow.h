@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "Simulator.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
