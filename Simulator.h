@@ -71,4 +71,13 @@ private:
 
 };
 
+#if DIM_COUNT <=0
+DIM_COUNT_should_be_a_positive_integer
+#endif
+
+#if BODY_COUNT <2
+BODY_COUNT_should_be_a_positive_integer_no_less_than_2
+#endif
+
+
 #endif // SIMULATOR_H
