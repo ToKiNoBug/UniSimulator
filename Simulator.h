@@ -11,7 +11,7 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#define DIM_COUNT 1
+#define DIM_COUNT 3
 #define BODY_COUNT 2
 
 extern const double G;

@@ -70,17 +70,13 @@ realDistance.setConstant(INF);
 for(uint16_t i=0;i<BODY_COUNT;i++) {
     for(uint16_t j=i+1;j<BODY_COUNT;j++) {
 
-        /*Eigen::Tensor<double,1> temp=y.first.chip(i,1);
-
-        std::cerr<<"size of y.first.chip(0,1)=["<<temp.dimension(0)<<"]\n";*/
-
         auto delta_r=y.first.chip(i,1)-y.first.chip(j,1);
         Eigen::Tensor<double,0> distanceT=delta_r.square().sum();
         double && distance= std::move(distanceT(0));
 
         realDistance(i,j)=distance;
         realDistance(j,i)=distance;
-        std::cerr<<"i="<<i<<", j="<<j<<std::endl;
+
         T.chip(j,2).chip(i,1)=delta_r/(std::sqrt(distance)*distance);
         T.chip(i,2).chip(j,1)=-T.chip(j,2).chip(i,1);
     }
