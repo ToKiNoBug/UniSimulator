@@ -17,7 +17,7 @@ void testSimulation();
 int main(int argc, char *argv[])
 {
 
-    testDerivative();
+    testSimulation();
 
     QApplication a(argc, argv);
     MainWindow w;
@@ -36,8 +36,10 @@ std::cerr<<"test started";
 MassVector M(Ms,1*Ms);
 
 Statue y,dy;
-y.first.setValues({{-rs,rs},{0,0}});
-y.second.setValues({{-vs,vs},{0,0}});
+y.first.setValues({{-rs,rs},
+                            {0,0}});
+y.second.setValues({{0,0},
+                                {-vs,vs}});
 
 DistanceMat safeMat;
 Simulator::calculateSafeDistance(M,safeMat);
@@ -96,8 +98,10 @@ void testDerivative() {
     MassVector M(Ms,Ms);
 
     Statue y;
-    y.first.setValues({{-rs,rs},{0,0}});
-    y.second.setValues({{-vs,vs},{0,0}});
+    y.first.setValues({{-rs,rs},
+                                {0,0}});
+    y.second.setValues({{0,0},
+                                    {-vs,vs}});
 
     Acceleration acc;
 
@@ -128,8 +132,10 @@ void testSimulation() {
     MassVector M(Ms,Ms);
 
     Statue y;
-    y.first.setValues({{-rs,rs},{0,0}});
-    y.second.setValues({{-vs,vs},{0,0}});
+    y.first.setValues({{-rs,rs},
+                                {0,0}});
+    y.second.setValues({{0,0},
+                                    {-vs,vs}});
 
     Acceleration acc;
 
@@ -161,7 +167,7 @@ void testSimulation() {
             break;
         }
     }
-    std::cout<<"finished\n";
+    std::cout<<"\nfinished\n";
     exit(0);
     return;
 }
