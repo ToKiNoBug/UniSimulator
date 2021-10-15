@@ -17,7 +17,7 @@ void testSimulation();
 int main(int argc, char *argv[])
 {
 
-    testSimulation();
+    //testSimulation();
 
     QApplication a(argc, argv);
     MainWindow w;

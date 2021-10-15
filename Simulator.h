@@ -56,6 +56,8 @@ typedef std::pair<Position,Velocity> Statue ;
 
 typedef  std::pair<Velocity,Acceleration> Derivative ;
 
+typedef std::pair<Time,Time> TimeSpan ;
+
 #ifdef IS_POINT_TUPLE
 typedef std::tuple<Time,Position,Velocity,Acceleration> Point;
 #else
@@ -67,7 +69,17 @@ class Simulator
 public:
     Simulator();
 
-    void simulate(const Statue &);
+    void simulateEuler(const double,
+                       TimeSpan,
+                       const MassVector &,
+                       Statue);
+
+    void simulateRK4Fixed(const double,
+                          TimeSpan,
+                          const MassVector &,
+                          Statue);
+
+    void clear();
 
     const std::list<Point> & getResult() const;
 

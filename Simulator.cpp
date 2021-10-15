@@ -122,6 +122,111 @@ y_n1.second=y_n.second+h/6*(k1.second+2*k2.second+2*k3.second+k4.second);
 return true;
 }
 
+void Simulator::clear() {
+    sol.clear();
+}
+
+void Simulator::simulateEuler(const double step,
+                   TimeSpan tSpan,
+                   const MassVector &Mass,
+                   Statue y) {
+    if(tSpan.second==tSpan.first) {
+        std::cerr<<"the begging time shouldn't equal to end time\n";
+        return;
+    }
+
+    if(tSpan.second<tSpan.first) {
+        std::swap(tSpan.first,tSpan.second);
+    }
+
+    if(tSpan.second-tSpan.first<step) {
+        std::cerr<<"time span should be greater than time step\n";
+        return;
+    }
+
+    clear();
+
+    DistanceMat safeDistance;
+    calculateSafeDistance(Mass,safeDistance);
+
+    Interaction GM;
+    calculateGM(Mass,GM);
+
+    Acceleration acc;
+
+    uint64_t i=0;
+    Time curTime;
+    while (true) {
+        curTime=tSpan.first+i*step;
+
+        if(curTime>tSpan.second) {
+            break;
+        }
+
+        sol.push_back(std::make_pair(curTime,y));
+
+        bool isOk=calculateDiff(y.first,GM,safeDistance,acc);
+
+        if(!isOk) {
+            std::cerr<<"Stars will collide\n";
+            break;
+        }
+
+        y.first+=step*y.second;
+        y.second+=step*acc;
+        i++;
+    }
+}
+
+void Simulator::simulateRK4Fixed(const double step,
+                   TimeSpan tSpan,
+                   const MassVector &Mass,
+                   Statue y) {
+    if(tSpan.second==tSpan.first) {
+        std::cerr<<"the begging time shouldn't equal to end time\n";
+        return;
+    }
+
+    if(tSpan.second<tSpan.first) {
+        std::swap(tSpan.first,tSpan.second);
+    }
+
+    if(tSpan.second-tSpan.first<step) {
+        std::cerr<<"time span should be greater than time step\n";
+        return;
+    }
+
+    clear();
+
+    DistanceMat safeDistance;
+    calculateSafeDistance(Mass,safeDistance);
+
+    Interaction GM;
+    calculateGM(Mass,GM);
+
+    Acceleration acc;
+
+    uint64_t i=0;
+    Time curTime;
+    while (true) {
+        curTime=tSpan.first+i*step;
+
+        if(curTime>tSpan.second) {
+            break;
+        }
+
+        sol.push_back(std::make_pair(curTime,y));
+
+        bool isOk=RK4(step,y,GM,safeDistance,y);
+
+        if(!isOk) {
+            std::cerr<<"Stars will collide\n";
+            break;
+        }
+        i++;
+    }
+}
+
 
 #if DIM_COUNT <=0
 DIM_COUNT_should_be_a_positive_integer
