@@ -12,7 +12,7 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#define DIM_COUNT 3
+#define DIM_COUNT 2
 #define BODY_COUNT 2
 
 extern const double G; //gravity constant
@@ -24,10 +24,13 @@ extern const double rs; //standard distance (1AU)
 extern const double vs; //standard speed
 extern const double as; //standard accelerate
 extern const double TimeMax; //max simulation time
+
+#ifdef IS_POINT_TUPLE
 extern const uint8_t tupleTimeIndex,
                                 tuplePositionIndex,
                                 tupleVelocityIndex,
                                 tupleAccelerlationIndex;
+#endif
 
 //typedef Eigen::TensorFixedSize<double,Eigen::Sizes<DimCount,BodyCount>> Position;
 
@@ -53,7 +56,11 @@ typedef std::pair<Position,Velocity> Statue ;
 
 typedef  std::pair<Velocity,Acceleration> Derivative ;
 
+#ifdef IS_POINT_TUPLE
 typedef std::tuple<Time,Position,Velocity,Acceleration> Point;
+#else
+typedef  std::pair<Time,Statue> Point ;
+#endif
 
 class Simulator
 {

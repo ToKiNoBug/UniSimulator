@@ -13,11 +13,12 @@ const double as=omega_s*vs;
 const double TimeMax=300*year;
 const double INF=1e300;
 
-
+#ifdef IS_POINT_TUPLE
 const uint8_t tupleTimeIndex=0,
                                 tuplePositionIndex=1,
                                 tupleVelocityIndex=2,
                                 tupleAccelerlationIndex=3;
+#endif
 
 Simulator::Simulator() {
 sol.clear();
@@ -55,27 +56,32 @@ DistanceMat realDistance;
 
 realDistance.setConstant(INF);
 
+//std::cerr<<"\npos.chip(0,1)=\n"<<pos.chip(0,1);
+
 for(uint16_t i=0;i<BODY_COUNT;i++) {
     for(uint16_t j=i+1;j<BODY_COUNT;j++) {
 
         auto delta_r=pos.chip(i,1)-pos.chip(j,1);
         Eigen::Tensor<double,0> distanceT=delta_r.square().sum();
         double && distance= std::move(distanceT(0));
+        double && distanceSqrt=std::sqrt(distance);
 
-        realDistance(i,j)=distance;
-        realDistance(j,i)=distance;
+        realDistance(i,j)=distanceSqrt;
+        realDistance(j,i)=distanceSqrt;
 
-        T.chip(j,2).chip(i,1)=delta_r/(std::sqrt(distance)*distance);
+        T.chip(j,2).chip(i,1)=delta_r/(distanceSqrt*distance);
         T.chip(i,2).chip(j,1)=-T.chip(j,2).chip(i,1);
     }
 }
+
+//std::cerr<<"\nrealDistance:\n"<<realDistance;
 
 if((realDistance<safeDistance).any()) {
     return false;
 }
 
 T*=GM;
-
+//std::cerr<<"\nT=\n"<<T;
 //dy.first=y.second;
 
 dy=T.sum(Eigen::array<int,1>({1}));
