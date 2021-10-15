@@ -128,8 +128,8 @@ void Simulator::clear() {
 
 void Simulator::simulateEuler(const double step,
                    TimeSpan tSpan,
-                   const MassVector &Mass,
-                   Statue y) {
+                   Statue y,
+                   bool * noCollide) {
     if(tSpan.second==tSpan.first) {
         std::cerr<<"the begging time shouldn't equal to end time\n";
         return;
@@ -144,18 +144,37 @@ void Simulator::simulateEuler(const double step,
         return;
     }
 
+    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+        Eigen::Tensor<double,0> temp=y.first.chip(dim,0).mean();
+        double && meanPos=std::move(temp(0));
+
+        temp=y.second.chip(dim,0).mean();
+        double && meanVelocity=std::move(temp(0));
+
+        for(uint16_t body=0;body<BODY_COUNT;body++) {
+            y.first(dim,body)-=meanPos;
+            y.second(dim,body-=meanVelocity);
+        }
+
+    }
+
     clear();
 
     DistanceMat safeDistance;
-    calculateSafeDistance(Mass,safeDistance);
+    calculateSafeDistance(mass,safeDistance);
 
     Interaction GM;
-    calculateGM(Mass,GM);
+    calculateGM(mass,GM);
 
     Acceleration acc;
 
     uint64_t i=0;
     Time curTime;
+
+    if(noCollide!=nullptr) {
+        *noCollide=true;
+    }
+
     while (true) {
         curTime=tSpan.first+i*step;
 
@@ -169,6 +188,9 @@ void Simulator::simulateEuler(const double step,
 
         if(!isOk) {
             std::cerr<<"Stars will collide\n";
+            if(noCollide!=nullptr) {
+                *noCollide=false;
+            }
             break;
         }
 
@@ -180,8 +202,8 @@ void Simulator::simulateEuler(const double step,
 
 void Simulator::simulateRK4Fixed(const double step,
                    TimeSpan tSpan,
-                   const MassVector &Mass,
-                   Statue y) {
+                   Statue y,
+                   bool * noCollide) {
     if(tSpan.second==tSpan.first) {
         std::cerr<<"the begging time shouldn't equal to end time\n";
         return;
@@ -198,16 +220,35 @@ void Simulator::simulateRK4Fixed(const double step,
 
     clear();
 
+    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+        Eigen::Tensor<double,0> temp=y.first.chip(dim,0).mean();
+        double && meanPos=std::move(temp(0));
+
+        temp=y.second.chip(dim,0).mean();
+        double && meanVelocity=std::move(temp(0));
+
+        for(uint16_t body=0;body<BODY_COUNT;body++) {
+            y.first(dim,body)-=meanPos;
+            y.second(dim,body-=meanVelocity);
+        }
+
+    }
+
     DistanceMat safeDistance;
-    calculateSafeDistance(Mass,safeDistance);
+    calculateSafeDistance(mass,safeDistance);
 
     Interaction GM;
-    calculateGM(Mass,GM);
+    calculateGM(mass,GM);
 
     Acceleration acc;
 
     uint64_t i=0;
     Time curTime;
+
+    if(noCollide!=nullptr) {
+        *noCollide=true;
+    }
+
     while (true) {
         curTime=tSpan.first+i*step;
 
@@ -221,12 +262,80 @@ void Simulator::simulateRK4Fixed(const double step,
 
         if(!isOk) {
             std::cerr<<"Stars will collide\n";
+            if(noCollide!=nullptr) {
+                *noCollide=false;
+            }
             break;
         }
         i++;
     }
 }
 
+
+void Simulator::setMass(const MassVector & _mass) {
+    mass=_mass;
+}
+
+const MassVector & Simulator::getMass() const {
+    return mass;
+}
+
+const std::list<Point> & Simulator::getResult() const {
+    return sol;
+}
+
+double Simulator::calculateKinetic(const std::_List_const_iterator<Point> it) const {
+    Eigen::Tensor<double,1> speedSquare
+            =it->second.second.square().sum(Eigen::array<int,1>({0}));
+    MassVector v;
+    for(uint16_t i=0;i<BODY_COUNT;i++) {
+        v(i)=speedSquare(i)/2;
+    }
+
+    return (v*mass).sum();
+}
+
+double Simulator::calculatePotential(const std::_List_const_iterator<Point> it) const {
+    DistanceMat realDistance;
+
+    realDistance.setZero();
+
+    const auto & pos=it->second.first;
+
+    for(uint16_t i=0;i<BODY_COUNT;i++) {
+        for(uint16_t j=i+1;j<BODY_COUNT;j++) {
+
+            auto delta_r=pos.chip(i,1)-pos.chip(j,1);
+            Eigen::Tensor<double,0> distanceT=delta_r.square().sum();
+            //double && distance= std::move(distanceT(0));
+            double && distanceSqrt=-G/std::sqrt(distanceT(0));
+
+            realDistance(i,j)=distanceSqrt;
+            realDistance(j,i)=distanceSqrt;
+        }
+    }
+
+    realDistance*=mass.replicate(1,BODY_COUNT);
+
+    return realDistance.sum();
+}
+
+double Simulator::calculateEnergy(const std::_List_const_iterator<Point> it) const {
+    return calculateKinetic(it)+calculatePotential(it);
+}
+
+void Simulator::calculateTotalMotion(const std::_List_const_iterator<Point> it,
+                          DimVector & dest) const {
+Eigen::Array<double,DIM_COUNT,BODY_COUNT> speed;
+for(uint16_t dim=0;dim<DIM_COUNT;dim++)
+    for(uint16_t body=0;body<BODY_COUNT;body++) {
+        speed(dim,body)=it->second.second(dim,body);
+    }
+
+speed.rowwise()*=mass.transpose();
+
+dest=speed.rowwise().sum();
+}
 
 #if DIM_COUNT <=0
 DIM_COUNT_should_be_a_positive_integer

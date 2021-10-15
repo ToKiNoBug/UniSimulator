@@ -50,6 +50,8 @@ typedef double Time ;
 
 typedef Eigen::Array<double,BODY_COUNT,1> MassVector ;
 
+typedef Eigen::Array<double,DIM_COUNT,1> DimVector ;
+
 typedef Eigen::Array<double,BODY_COUNT,BODY_COUNT> DistanceMat ;
 
 typedef std::pair<Position,Velocity> Statue ;
@@ -71,17 +73,31 @@ public:
 
     void simulateEuler(const double,
                        TimeSpan,
-                       const MassVector &,
-                       Statue);
+                       Statue,
+                       bool * noCollide=nullptr);
 
     void simulateRK4Fixed(const double,
                           TimeSpan,
-                          const MassVector &,
-                          Statue);
+                          Statue,
+                          bool * noCollide=nullptr);
 
     void clear();
 
+    void setMass(const MassVector &);
+
+    const MassVector & getMass() const;
+
     const std::list<Point> & getResult() const;
+
+    double calculateKinetic(const std::_List_const_iterator<Point>) const;
+
+    double calculatePotential(const std::_List_const_iterator<Point>) const;
+
+    double calculateEnergy(const std::_List_const_iterator<Point>) const;
+
+    void calculateTotalMotion(const std::_List_const_iterator<Point>,
+                                                DimVector &) const;
+
 
     static void calculateSafeDistance(const MassVector &,
                                                             DistanceMat & dest);
@@ -103,6 +119,8 @@ public:
 
 private:
     std::list<Point> sol;
+
+    MassVector mass;
 
 
 };

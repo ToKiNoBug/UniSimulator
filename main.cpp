@@ -12,12 +12,17 @@
 void testDerivative();
 void testPerformance();
 void testSimulation();
+
+void testEuler();
+void testRK4Fixed();
 #endif
 
 int main(int argc, char *argv[])
 {
 
     //testSimulation();
+
+    testEuler();
 
     QApplication a(argc, argv);
     MainWindow w;
@@ -170,5 +175,51 @@ void testSimulation() {
     std::cout<<"\nfinished\n";
     exit(0);
     return;
+}
+
+void testEuler() {
+
+    Simulator S;
+
+    MassVector mass(Ms,2*Ms);
+
+    Statue start;
+    start.first.setValues({{-rs,rs},
+                                    {0,0}});
+    start.second.setValues({{0,0},
+                                          {-vs,vs}});
+
+    TimeSpan tSpan=std::make_pair(0*year,10*year);
+
+    Time step=1e-2*year;
+
+    S.setMass(mass);
+
+    bool noCollide;
+
+    std::cerr<<"simulation begin\n";
+    S.simulateEuler(step,tSpan,start,&noCollide);
+    std::cerr<<"simulation ended\n";
+
+    if(!noCollide) {
+        std::cout<<"simulation in euler method ended by a future collision\n";
+    }
+
+    auto * sol=&S.getResult();
+    for(auto it=sol->cbegin();it!=sol->cend();it++) {
+        DimVector dv;
+        S.calculateTotalMotion(it,dv);
+        std::cerr<<"\nmotion:["<<dv.transpose()<<"]\n";
+
+        double kinetic,potential;
+        kinetic=S.calculateKinetic(it);
+        potential=S.calculatePotential(it);
+
+        std::cerr<<"Kinetic="<<kinetic<<" , Potential="<<potential<<std::endl;
+        std::cerr<<"Energy="<<kinetic+potential<<std::endl;
+    }
+
+    exit(0);
+
 }
 #endif

@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="0">
+    <item row="2" column="1">
      <widget class="QSlider" name="timeSlider">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -25,8 +25,44 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="chartArea"/>
+    <item row="0" column="0" colspan="2">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="dynamicArea">
+       <attribute name="title">
+        <string>Dynamic</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3"/>
+      </widget>
+      <widget class="QWidget" name="conservationArea">
+       <attribute name="title">
+        <string>Conservation</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QWidget" name="widget" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QWidget" name="widget_2" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="displayTime">
+      <property name="minimumSize">
+       <size>
+        <width>125</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Time:</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
