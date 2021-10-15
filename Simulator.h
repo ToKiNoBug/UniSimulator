@@ -5,6 +5,7 @@
 #include <cmath>
 #include <list>
 #include <vector>
+#include <tuple>
 
 //#define EIGEN_NO_DEBUG
 
@@ -14,15 +15,19 @@
 #define DIM_COUNT 3
 #define BODY_COUNT 2
 
-extern const double G;
-extern const double Ms;
-extern const double omega_s;
-extern const double rho;
-extern const double year;
-extern const double rs;
-extern const double vs;
-extern const double as;
-extern const double TimeMax;
+extern const double G; //gravity constant
+extern const double Ms; //standard mass (solar mass)
+extern const double omega_s; //standard angle speed
+extern const double rho; //solar density
+extern const double year; //seconds of a year
+extern const double rs; //standard distance (1AU)
+extern const double vs; //standard speed
+extern const double as; //standard accelerate
+extern const double TimeMax; //max simulation time
+extern const uint8_t tupleTimeIndex,
+                                tuplePositionIndex,
+                                tupleVelocityIndex,
+                                tupleAccelerlationIndex;
 
 //typedef Eigen::TensorFixedSize<double,Eigen::Sizes<DimCount,BodyCount>> Position;
 
@@ -48,7 +53,7 @@ typedef std::pair<Position,Velocity> Statue ;
 
 typedef  std::pair<Velocity,Acceleration> Derivative ;
 
-typedef std::pair<Time,Statue> Point ;
+typedef std::tuple<Time,Position,Velocity,Acceleration> Point;
 
 class Simulator
 {
@@ -65,13 +70,13 @@ public:
     static void calculateGM(const MassVector &,
                                                             Interaction &);
 
-    static bool calculateDiff(const Statue & y,
+    static bool calculateDiff(const Position & y,
                              const Interaction &,
                              const DistanceMat &,
                              Acceleration & dy);
     //To avoid useless deep copying, dy.first will not be used.
 
-    static bool RK4(const double h,
+    static bool RK4(const Time h,
                     const Statue & y,
                     const Interaction &,
                     const DistanceMat& ,
