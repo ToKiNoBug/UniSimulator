@@ -46,6 +46,8 @@ typedef Eigen::Array<double,BODY_COUNT,BODY_COUNT> DistanceMat ;
 
 typedef std::pair<Position,Velocity> Statue ;
 
+typedef  std::pair<Velocity,Acceleration> Derivative ;
+
 typedef std::pair<Time,Statue> Point ;
 
 class Simulator
@@ -62,10 +64,18 @@ public:
 
     static void calculateGM(const MassVector &,
                                                             Interaction &);
+
     static bool calculateDiff(const Statue & y,
                              const Interaction &,
                              const DistanceMat &,
-                             Statue & dy); //To avoid useless deep copying, dy.first will not be used.
+                             Acceleration & dy);
+    //To avoid useless deep copying, dy.first will not be used.
+
+    static bool RK4(const double h,
+                    const Statue & y,
+                    const Interaction &,
+                    const DistanceMat& ,
+                    Statue & y_n1);
 
 private:
     std::list<Point> sol;

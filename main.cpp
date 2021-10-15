@@ -51,7 +51,7 @@ double h=1e-3*year;
 for(int i=0;i<repeatTime;i++) {
     if(i%1024==0)
 std::cerr<<i<<std::endl;
-bool isOk=Simulator::calculateDiff(y,GM,safeMat,dy);
+bool isOk=Simulator::calculateDiff(y,GM,safeMat,dy.second);
 if(!isOk) {
     std::cerr<<"stars will collide\n";
     break;

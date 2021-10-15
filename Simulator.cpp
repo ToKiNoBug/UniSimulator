@@ -59,7 +59,7 @@ for(int i=0;i<GM.dimension(1);i++) {
 bool Simulator::calculateDiff(const Statue & y,
                              const Interaction & GM,
                              const DistanceMat & safeDistance,
-                             Statue & dy) {
+                             Acceleration & dy) {
 Interaction T;
 T.setZero();
 
@@ -90,7 +90,47 @@ T*=GM;
 
 //dy.first=y.second;
 
-dy.second=T.sum(Eigen::array<int,1>({1}));
+dy=T.sum(Eigen::array<int,1>({1}));
+return true;
+}
+
+bool Simulator::RK4(const double h,
+                    const Statue & y_n,
+                    const Interaction & GM,
+                    const DistanceMat & safeDistance,
+         Statue & y_n1) {
+bool isOk=true;
+
+double && halfStep=h/2;
+
+Derivative k1,k2,k3,k4;
+Statue temp=y_n;
+isOk=calculateDiff(temp,GM,safeDistance,k1.second);
+k1.first=temp.second;
+if(!isOk) return false;
+
+
+temp.first=y_n.first+halfStep*k1.first;
+temp.second=y_n.second+halfStep*k1.second;
+isOk=calculateDiff(temp,GM,safeDistance,k2.second);
+k2.first=temp.second;
+if(!isOk) return false;
+
+temp.first=y_n.first+halfStep*k2.first;
+temp.second=y_n.second+halfStep*k2.second;
+isOk=calculateDiff(temp,GM,safeDistance,k3.second);
+k3.first=temp.second;
+if(!isOk) return false;
+
+temp.first=y_n.first+h*k3.first;
+temp.second=y_n.second+h*k3.second;
+isOk=calculateDiff(temp,GM,safeDistance,k4.second);
+k4.first=temp.second;
+if(!isOk) return false;
+
+y_n1.first=y_n.first+h/6*(k1.first+2*k2.first+2*k3.first+k4.first);
+y_n1.second=y_n.second+h/6*(k1.second+2*k2.second+2*k3.second+k4.second);
+
 return true;
 }
 
