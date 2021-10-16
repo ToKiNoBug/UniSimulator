@@ -34,13 +34,45 @@
        <attribute name="title">
         <string>Dynamic</string>
        </attribute>
-       <layout class="QGridLayout" name="dynamicLayout"/>
+       <layout class="QGridLayout" name="dynamicLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="horizontalSpacing">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
       <widget class="QWidget" name="conservationArea">
        <attribute name="title">
         <string>Conservation</string>
        </attribute>
-       <layout class="QGridLayout" name="conervativeLayout"/>
+       <layout class="QGridLayout" name="conervativeLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
      </widget>
     </item>

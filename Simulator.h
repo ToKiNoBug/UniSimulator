@@ -71,6 +71,12 @@ class Simulator
 public:
     Simulator();
 
+    enum Algorithm {
+        Euler,
+        RK4Fixed,
+        //ODE45
+    };
+
     void simulateEuler(const double,
                        TimeSpan,
                        Statue,

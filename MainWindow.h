@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtCharts>
+#include <stack>
 #include "Simulator.h"
 
 QT_BEGIN_NAMESPACE
@@ -17,10 +18,27 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void runSimulaton(Simulator::Algorithm);
+
+    void runSimulaton(Simulator::Algorithm,
+                      const double,
+                      const TimeSpan &,
+                      const Statue &,
+                      const MassVector &,
+                      bool * noCollide=nullptr);
+
+    void drawCharts();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;
-    std::array<std::pair<QChartView *,QChart* > ,2> conservativeQuatity;
+    QChartView * MotionView;
+    QChartView * EnergyView;
+
+    static QChart * createEmptyChart();
+
+    static void addSeriesToChart(QChart *,QList<QVector<QPointF>>&,
+                                 int * =nullptr);
 
 };
 #endif // MAINWINDOW_H
