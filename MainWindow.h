@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QtCharts>
 #include "Simulator.h"
 
 QT_BEGIN_NAMESPACE
@@ -19,5 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Simulator Simu;
+    std::array<std::pair<QChartView *,QChart* > ,2> conservativeQuatity;
+
 };
 #endif // MAINWINDOW_H

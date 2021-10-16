@@ -13,11 +13,13 @@ INCLUDEPATH += D:/CppLibs/eigen-3.4.0
 SOURCES += \
     Simulator.cpp \
     main.cpp \
-    MainWindow.cpp
+    MainWindow.cpp \
+    tests.cpp
 
 HEADERS += \
     MainWindow.h \
-    Simulator.h
+    Simulator.h \
+    tests.h
 
 FORMS += \
     MainWindow.ui

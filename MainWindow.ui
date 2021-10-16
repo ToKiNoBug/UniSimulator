@@ -34,20 +34,13 @@
        <attribute name="title">
         <string>Dynamic</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3"/>
+       <layout class="QGridLayout" name="dynamicLayout"/>
       </widget>
       <widget class="QWidget" name="conservationArea">
        <attribute name="title">
         <string>Conservation</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QWidget" name="widget" native="true"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QWidget" name="widget_2" native="true"/>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="conervativeLayout"/>
       </widget>
      </widget>
     </item>

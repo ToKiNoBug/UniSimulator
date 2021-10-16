@@ -314,8 +314,8 @@ double Simulator::calculatePotential(const std::_List_const_iterator<Point> it) 
             realDistance(j,i)=distanceSqrt;
         }
     }
-
-    realDistance*=mass.replicate(1,BODY_COUNT);
+    auto massMatrix=mass.matrix();
+    realDistance*=(massMatrix*massMatrix.transpose()).array();
 
     return realDistance.sum();
 }
