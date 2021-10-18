@@ -96,6 +96,12 @@ QChart * MainWindow::createEmptyChart() {
 
     chart->layout()->setContentsMargins(5, 5, 5, 5);
     chart->setMargins(QMargins(0, 0, 0, 0));
+    QChart::AnimationOptions op;
+
+    op.setFlag(QChart::AnimationOption::GridAxisAnimations,false);
+    op.setFlag(QChart::AnimationOption::SeriesAnimations,true);
+
+    chart->setAnimationOptions(op);
     //chart->setBackgroundRoundness(0);
 
     return chart;
@@ -152,16 +158,16 @@ void MainWindow::drawCharts() {
         std::cerr<<"No avaliable simulation result\n";
         return;
     }
-qDebug()<<__LINE__;
+//qDebug()<<__LINE__;
     const auto * result=&Simu.getResult();
 
-qDebug()<<__LINE__;
+//qDebug()<<__LINE__;
     QList<QVector<QPointF>> energy;
     energy.clear();
     energy.push_back(QVector<QPointF>());
     auto & energyHead=energy.first();
     energyHead.reserve(result->size());
-qDebug()<<__LINE__;
+//qDebug()<<__LINE__;
 
     QList<QVector<QPointF>> motions;
     for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
@@ -182,18 +188,35 @@ qDebug()<<__LINE__;
             motions[dim].push_back(QPointF(yearTime,motionVal[dim]));
         }
     }
-qDebug()<<__LINE__;
+//qDebug()<<__LINE__;
     {
         int yPower;
         addSeriesToChart(EnergyView->chart(),
                          energy,&yPower);
-        qDebug()<<__LINE__;
+        //qDebug()<<__LINE__;
         EnergyView->chart()->legend()->hide();
         EnergyView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
         EnergyView->chart()->axes(Qt::Vertical).first()->setTitleText(
-                    "Energy (SI * 10E"+QString::number(yPower)+")");
-        qDebug()<<__LINE__;
+                    "Energy (SI * 1E"+QString::number(yPower)+")");
+        //qDebug()<<__LINE__;
         EnergyView->setRenderHint(QPainter::Antialiasing, true);
+    }
+
+    {
+        int yPower;
+        addSeriesToChart(MotionView->chart(),
+                         motions,&yPower);
+        MotionView->chart()->legend()->setAlignment(Qt::AlignmentFlag::AlignRight);
+        MotionView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
+        MotionView->chart()->axes(Qt::Vertical).first()->setTitleText(
+                    "Motion (SI * 1E"+QString::number(yPower)+")");
+
+        auto serieses=MotionView->chart()->series();
+
+        for(uint16_t i=0;i<serieses.size();i++) {
+            serieses[i]->setName("Dim "+QString::number(i));
+        }
+        MotionView->setRenderHint(QPainter::Antialiasing, true);
     }
 
 }
