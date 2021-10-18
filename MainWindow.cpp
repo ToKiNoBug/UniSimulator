@@ -25,7 +25,33 @@ MainWindow::MainWindow(QWidget *parent)
     EnergyView->chart()->axes(Qt::Vertical).first()->setTitleText("Energy (SI)");
     EnergyView->setRenderHint(QPainter::Antialiasing, true);
 
+    {
+        auto it = pathViews.begin();
+        auto dt = dimPairs.begin();
+        const uint16_t colCount=std::ceil(std::floor(std::sqrt(pathViews.size())));
+        uint32_t chartOrder=0;
+        for(uint16_t dimA=0;dimA<DIM_COUNT;dimA++) {
+            for(uint16_t dimB=dimA+1;dimB<DIM_COUNT;dimB++) {
+                dt->first=dimA;
+                dt->second=dimB;
+                *it=new QChartView(this);
+                ui->dynamicLayout->addWidget(*it,
+                                             chartOrder/colCount,chartOrder%colCount);
+                (*it)->setChart(createEmptyChart());
+                (*it)->chart()->setTitle("Path on : Dim "+QString::number(dimA)+
+                                         " - Dim "+QString::number(dimB));
 
+                (*it)->chart()->axes(Qt::Horizontal).first()->setTitleText(
+                            "Dim "+QString::number(dimA));
+               (*it)->chart()->axes(Qt::Vertical).first()->setTitleText(
+                            "Dim "+QString::number(dimB));
+                (*it)->setRenderHint(QPainter::Antialiasing, true);
+                dt++;
+                it++;
+                chartOrder++;
+            }
+        }
+    }
 
 
     /*
@@ -112,6 +138,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo) {
+#ifdef TEST_BODY2DIM2
     MassVector mass(Ms,2*Ms);
 
     Statue start;
@@ -125,6 +152,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     Time step=0.001*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
+#endif
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo,
@@ -153,7 +181,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
 }
 
 
-void MainWindow::drawCharts() {
+void MainWindow::drawConservativeCharts() {
     if(Simu.getResult().size()<=0) {
         std::cerr<<"No avaliable simulation result\n";
         return;
