@@ -112,12 +112,12 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo) {
-    MassVector mass(Ms,2*Ms);
+    MassVector mass(Ms,1*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},
                                     {0,0}});
-    start.second.setValues({{0,0},
+    start.second.setValues({{-0*vs,0},
                                           {-vs,vs}});
 
     TimeSpan tSpan=std::make_pair(0*year,10*year);
@@ -197,7 +197,7 @@ void MainWindow::drawCharts() {
         EnergyView->chart()->legend()->hide();
         EnergyView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
         EnergyView->chart()->axes(Qt::Vertical).first()->setTitleText(
-                    "Energy (SI * 1E"+QString::number(yPower)+")");
+                    "Energy (SI × 1E"+QString::number(yPower)+")");
         //qDebug()<<__LINE__;
         EnergyView->setRenderHint(QPainter::Antialiasing, true);
     }
@@ -209,7 +209,7 @@ void MainWindow::drawCharts() {
         MotionView->chart()->legend()->setAlignment(Qt::AlignmentFlag::AlignRight);
         MotionView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
         MotionView->chart()->axes(Qt::Vertical).first()->setTitleText(
-                    "Motion (SI * 1E"+QString::number(yPower)+")");
+                    "Motion (SI × 1E"+QString::number(yPower)+")");
 
         auto serieses=MotionView->chart()->series();
 
