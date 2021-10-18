@@ -112,7 +112,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo) {
-    MassVector mass(Ms,1*Ms);
+    MassVector mass(Ms,2*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},
@@ -162,19 +162,17 @@ void MainWindow::drawCharts() {
     const auto * result=&Simu.getResult();
 
 //qDebug()<<__LINE__;
-    QList<QVector<QPointF>> energy;
-    energy.clear();
-    energy.push_back(QVector<QPointF>());
+    QList<QVector<QPointF>> energy(1);
     auto & energyHead=energy.first();
+    energyHead.resize(0);
     energyHead.reserve(result->size());
 //qDebug()<<__LINE__;
 
-    QList<QVector<QPointF>> motions;
-    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
-        motions.push_back(QVector<QPointF>());
-    }
+    QList<QVector<QPointF>> motions(DIM_COUNT);
+
     for(auto it : motions) {
         it.clear();
+        it.resize(0);
         it.reserve(result->size());
     }
 
@@ -204,8 +202,11 @@ void MainWindow::drawCharts() {
 
     {
         int yPower;
+
+        qDebug()<<__LINE__;
         addSeriesToChart(MotionView->chart(),
                          motions,&yPower);
+        qDebug()<<__LINE__;
         MotionView->chart()->legend()->setAlignment(Qt::AlignmentFlag::AlignRight);
         MotionView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
         MotionView->chart()->axes(Qt::Vertical).first()->setTitleText(
@@ -224,38 +225,17 @@ void MainWindow::drawCharts() {
 void MainWindow::addSeriesToChart(QChart * chart,
                                   QList<QVector<QPointF>>& data,
                                   int * yScalePower) {
+    const double xmin=data[0].first().x(),xmax=data[0].back().x();
     double ymax,ymin;
-    double xmin=data[0][0].x(),xmax=data[0].back().x();
     chart->removeAllSeries();
     //if(chart->series().empty()) {
-        ymax=data.first()[0].y();
+        ymax=data[0][0].y();
         ymin=ymax;
     //}
-    /* else {
-
-        const QValueAxis * xAxis=
-                qobject_cast<QValueAxis*>(chart->axes(Qt::Horizontal).first());
-        const QValueAxis * yAxis=
-                qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
-        max.setX(xAxis->max());
-        max.setY(xAxis->max());
-        min.setX(xAxis->min());
-        min.setY(yAxis->min());
-
-        for(auto it : data) {
-            min.setX(std::min(min.x(),it.x()));
-            min.setY(std::min(min.y(),it.y()));
-
-            max.setX(std::max(max.x(),it.x()));
-            max.setY(std::max(max.y(),it.y()));
-        }
-
-    }*/
-
-    for(auto it : data) {
-        for(auto jt : it) {
-            ymin=std::min(ymin,jt.y());
-            ymax=std::max(ymax,jt.y());
+    for(auto it=data.cbegin();it!=data.cend();it++) {
+        for(auto jt=it->cbegin();jt!=it->cend();jt++) {
+            ymin=std::min(ymin,jt->y());
+            ymax=std::max(ymax,jt->y());
         }
     }
 
@@ -273,19 +253,27 @@ void MainWindow::addSeriesToChart(QChart * chart,
         *yScalePower=yScale;
     }
 
-    for(auto it : data) {
-        for(auto jt : it) {
-            jt.setY(jt.y()/yRatio);
+    for(auto it=data.begin();it!=data.end();it++) {
+        for(auto jt=it->begin();jt!=it->end();jt++) {
+            jt->setY(jt->y()/yRatio);
         }
     }
 
-    for(auto it : data) {
+    QValueAxis * xAxis=qobject_cast<QValueAxis *>(chart->axes(Qt::Horizontal).first());
+    QValueAxis * yAxis=qobject_cast<QValueAxis *>(chart->axes(Qt::Vertical).first());
+
+    qDebug()<<__LINE__;
+        xAxis->setRange(xmin,xmax);
+        yAxis->setRange(ymin,ymax);
+
+    qDebug()<<__LINE__;
+    for(uint16_t d=0;d<data.size();d++) {
         QLineSeries * series=new QLineSeries;
-        series->replace(it);
+        series->replace(data[d]);
         chart->addSeries(series);
+
+        series->attachAxis(xAxis);
+        series->attachAxis(yAxis);
     }
-qDebug()<<__LINE__;
-    chart->axes(Qt::Horizontal).first()->setRange(xmin,xmax);
-    chart->axes(Qt::Vertical).first()->setRange(ymin,ymax);
-qDebug()<<__LINE__;
+
 }
