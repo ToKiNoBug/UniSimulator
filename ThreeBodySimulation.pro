@@ -19,6 +19,7 @@ SOURCES += \
 HEADERS += \
     MainWindow.h \
     Simulator.h \
+    defines.h \
     tests.h
 
 FORMS += \

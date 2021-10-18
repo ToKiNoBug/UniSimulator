@@ -7,13 +7,8 @@
 #include <vector>
 #include <tuple>
 
-//#define EIGEN_NO_DEBUG
 
-#include <Eigen/Dense>
-#include <unsupported/Eigen/CXX11/Tensor>
-
-#define DIM_COUNT 2
-#define BODY_COUNT 2
+#include "defines.h"
 
 extern const double G; //gravity constant
 extern const double Ms; //standard mass (solar mass)
@@ -24,47 +19,6 @@ extern const double rs; //standard distance (1AU)
 extern const double vs; //standard speed
 extern const double as; //standard accelerate
 extern const double TimeMax; //max simulation time
-
-#ifdef IS_POINT_TUPLE
-extern const uint8_t tupleTimeIndex,
-                                tuplePositionIndex,
-                                tupleVelocityIndex,
-                                tupleAccelerlationIndex;
-#endif
-
-//typedef Eigen::TensorFixedSize<double,Eigen::Sizes<DimCount,BodyCount>> Position;
-
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Position;
-
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Velocity;
-
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Acceleration;
-
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT,BODY_COUNT>> Interaction;
-
-typedef double Time ;
-
-typedef Eigen::Array<double,BODY_COUNT,1> MassVector ;
-
-typedef Eigen::Array<double,DIM_COUNT,1> DimVector ;
-
-typedef Eigen::Array<double,BODY_COUNT,BODY_COUNT> DistanceMat ;
-
-typedef std::pair<Position,Velocity> Statue ;
-
-typedef  std::pair<Velocity,Acceleration> Derivative ;
-
-typedef std::pair<Time,Time> TimeSpan ;
-
-#ifdef IS_POINT_TUPLE
-typedef std::tuple<Time,Position,Velocity,Acceleration> Point;
-#else
-typedef  std::pair<Time,Statue> Point ;
-#endif
 
 class Simulator
 {

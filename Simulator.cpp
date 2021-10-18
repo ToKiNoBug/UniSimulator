@@ -317,7 +317,7 @@ double Simulator::calculatePotential(const std::_List_const_iterator<Point> it) 
     auto massMatrix=mass.matrix();
     realDistance*=(massMatrix*massMatrix.transpose()).array();
 
-    return realDistance.sum();
+    return realDistance.sum()/2;
 }
 
 double Simulator::calculateEnergy(const std::_List_const_iterator<Point> it) const {
@@ -336,11 +336,3 @@ speed.rowwise()*=mass.transpose();
 
 dest=speed.rowwise().sum();
 }
-
-#if DIM_COUNT <=0
-DIM_COUNT_should_be_a_positive_integer
-#endif
-
-#if BODY_COUNT <2
-BODY_COUNT_should_be_a_positive_integer_no_less_than_2
-#endif

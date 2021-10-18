@@ -54,7 +54,7 @@
       </widget>
       <widget class="QWidget" name="conservationArea">
        <attribute name="title">
-        <string>Conservation</string>
+        <string>Conservative</string>
        </attribute>
        <layout class="QGridLayout" name="conervativeLayout">
         <property name="leftMargin">
