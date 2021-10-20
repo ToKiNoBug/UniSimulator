@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         auto it = pathViews.begin();
         auto dt = dimPairs.begin();
-        const uint16_t colCount=std::ceil(std::floor(std::sqrt(pathViews.size())));
+        const uint16_t colCount=std::floor(std::sqrt(pathViews.size()));
         uint32_t chartOrder=0;
         for(uint16_t dimA=0;dimA<DIM_COUNT;dimA++) {
             for(uint16_t dimB=dimA+1;dimB<DIM_COUNT;dimB++) {
@@ -53,49 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-
-    /*
-    ui->conervativeLayout->addWidget(
-                conservativeQuatity[0].first=new QChartView(this)
-            ,0,0);
-    conservativeQuatity[0].second=new QChart();
-    conservativeQuatity[0].second->setTitle("Motion");
-    conservativeQuatity[0].second->setTheme(QChart::ChartTheme::ChartThemeLight);
-    {
-        QLineSeries * temp=new QLineSeries(this);
-        temp->clear();
-        for(int i=0;i<100;i++) {
-            temp->append(i,sin(i));
-        }
-        conservativeQuatity[0].second->addSeries(temp);
-
-        QValueAxis * tempAxis=new QValueAxis;
-        tempAxis->setGridLineVisible(true);
-        tempAxis->setVisible(true);
-        tempAxis->setRange(0,99);
-        tempAxis->setTitleText("Time / s");
-        conservativeQuatity[0].second->addAxis(tempAxis,Qt::AlignBottom);
-
-        tempAxis=new QValueAxis;
-        tempAxis->setGridLineVisible(true);
-        tempAxis->setVisible(true);
-        tempAxis->setRange(-1,1);
-        tempAxis->setTitleText("Motion(SI)");
-        conservativeQuatity[0].second->addAxis(tempAxis,Qt::AlignLeft);
-        conservativeQuatity[0].second->legend()->hide();
-    }
-    conservativeQuatity[0].first->setChart(conservativeQuatity[0].second);
-    conservativeQuatity[0].first->setRenderHint(QPainter::Antialiasing);
-
-    ui->conervativeLayout->addWidget(
-                conservativeQuatity[1].first=new QChartView(this)
-            ,1,0);
-    conservativeQuatity[1].second=new QChart();
-    conservativeQuatity[1].second->setTitle("Energy");
-    conservativeQuatity[1].second->setTheme(QChart::ChartTheme::ChartThemeLight);
-    conservativeQuatity[1].first->setChart(conservativeQuatity[1].second);
-    conservativeQuatity[1].first->setRenderHint(QPainter::Antialiasing);
-*/
 }
 
 QChart * MainWindow::createEmptyChart() {
@@ -144,12 +101,12 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     Statue start;
     start.first.setValues({{-rs,rs},
                                     {0,0}});
-    start.second.setValues({{-0*vs,0},
+    start.second.setValues({{-1*vs,0},
                                           {-vs,vs}});
 
     TimeSpan tSpan=std::make_pair(0*year,10*year);
 
-    Time step=0.001*year;
+    Time step=0.01*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif
@@ -303,5 +260,139 @@ void MainWindow::addSeriesToChart(QChart * chart,
         series->attachAxis(xAxis);
         series->attachAxis(yAxis);
     }
+
+}
+
+void MainWindow::drawPathCharts() {
+    if(Simu.getResult().size()<=0) {
+        std::cerr<<"No avaliable simulation result\n";
+        return;
+    }
+
+    std::array<std::array<QVector<QPointF>*,BODY_COUNT>,
+            DIM_COUNT*(DIM_COUNT-1)/2> chartDatas;
+
+    std::array<std::array<QLineSeries *,BODY_COUNT>,
+            DIM_COUNT*(DIM_COUNT-1)/2> chartsSerieses;
+
+    std::array<float,DIM_COUNT> posMin,posMax;//DimVector
+
+    //double tmin=Simu.getResult().front().first,tmax=Simu.getResult().back().first;
+    {
+        const Point & begin=Simu.getResult().front();
+        for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+            Eigen::Tensor<double,0> max,min;
+            max=begin.second.first.chip(dim,0).maximum();
+            min=begin.second.first.chip(dim,0).minimum();
+            posMin[dim]=min(0);
+            posMax[dim]=max(0);
+        }
+    }
+
+    for(uint32_t chartIdx=0;chartIdx<chartDatas.size();chartIdx++) {
+        for(uint32_t bodyIdx=0;bodyIdx<BODY_COUNT;bodyIdx++) {
+            chartDatas[chartIdx][bodyIdx]=new QVector<QPointF>;
+            chartDatas[chartIdx][bodyIdx]->resize(0);
+            chartDatas[chartIdx][bodyIdx]->reserve(Simu.getResult().size());
+
+            chartsSerieses[chartIdx][bodyIdx]=new QLineSeries;
+        }
+    }
+
+    //run over the whole history
+    for(auto it=Simu.getResult().cbegin();it!=Simu.getResult().cend();it++) {
+        const Position & pos = it->second.first;
+
+        //run over all dimensions to update max and min value of coordinates
+        for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+            Eigen::Tensor<double,0> max,min;
+            max=pos.chip(dim,0).maximum();
+            min=pos.chip(dim,0).minimum();
+            posMin[dim]=std::min(posMin[dim],float(min(0)));
+            posMax[dim]=std::max(posMax[dim],float(max(0)));
+        }
+
+        //run over each chart
+        for(uint32_t chartIdx=0;chartIdx<chartDatas.size();chartIdx++) {
+            uint16_t dim_x,dim_y;
+            dim_x=dimPairs[chartIdx].first;
+            dim_y=dimPairs[chartIdx].second;
+
+            //run over each body of chart
+            for(uint32_t bodyIdx=0;bodyIdx<BODY_COUNT;bodyIdx++) {
+
+                float xVal,yVal;
+                xVal=pos(dim_x,bodyIdx);
+                yVal=pos(dim_y,bodyIdx);
+
+                chartDatas[chartIdx][bodyIdx]->push_back(QPointF(xVal,yVal));
+            }
+        }
+    }
+
+    std::array<float,DIM_COUNT> dimRatios;
+    std::array<int,DIM_COUNT> dimScales;
+
+    //run over all dimensions and process the max and min pos value
+    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+        dimScales[dim]=std::floor(std::log10(
+                                      std::max(std::abs(posMin[dim]),std::abs(posMax[dim]))));
+        dimRatios[dim]=std::pow(10,dimScales[dim]);
+
+        posMin[dim]/=dimRatios[dim];
+        posMax[dim]/=dimRatios[dim];
+    }
+
+    //run over all charts
+    for(uint32_t chartIdx=0;chartIdx<chartDatas.size();chartIdx++) {
+
+        uint16_t dim_x,dim_y;
+        dim_x=dimPairs[chartIdx].first;
+        dim_y=dimPairs[chartIdx].second;
+        //run over all series (each series is a body's path)
+        for(uint32_t bodyIdx=0;bodyIdx<BODY_COUNT;bodyIdx++) {
+            auto curQvQpf=chartDatas[chartIdx][bodyIdx];
+            //run over the whole history and scale down all values
+            for(auto it=curQvQpf->begin();it!=curQvQpf->end();it++) {
+                it->setX(it->x()/dimRatios[dim_x]);
+                it->setY(it->y()/dimRatios[dim_y]);
+            }
+        }
+    }
+
+    for(uint32_t chartIdx=0;chartIdx<chartDatas.size();chartIdx++) {
+        QChart * curChart=pathViews[chartIdx]->chart();
+        uint16_t dim_x,dim_y;
+        dim_x=dimPairs[chartIdx].first;
+        dim_y=dimPairs[chartIdx].second;
+
+        curChart->removeAllSeries();
+        QValueAxis * xAxis=qobject_cast<QValueAxis *>
+                (curChart->axes(Qt::Horizontal).first());
+        QValueAxis * yAxis=qobject_cast<QValueAxis *>
+                (curChart->axes(Qt::Vertical).first());
+        xAxis->setRange(posMin[dim_x],posMax[dim_x]);
+        yAxis->setRange(posMin[dim_y],posMax[dim_y]);
+
+        for(uint32_t bodyIdx=0;bodyIdx<BODY_COUNT;bodyIdx++) {
+            auto curSeries=chartsSerieses[chartIdx][bodyIdx];
+            curSeries->replace(*chartDatas[chartIdx][bodyIdx]);
+            curChart->addSeries(curSeries);
+            curSeries->attachAxis(xAxis);
+            curSeries->attachAxis(yAxis);
+            delete chartDatas[chartIdx][bodyIdx];
+        }
+        curChart->legend()->hide();
+        xAxis->setTitleText("Dim "
+                            +QString::number(dim_x)
+                            +" (SI × 1E"
+                            +QString::number(dimScales[dim_x])+")");
+        yAxis->setTitleText("Dim "
+                            +QString::number(dim_y)
+                            +" (SI × 1E"
+                            +QString::number(dimScales[dim_y])+")");
+    }
+
+
 
 }

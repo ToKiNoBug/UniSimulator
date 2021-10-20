@@ -153,7 +153,7 @@ void Simulator::simulateEuler(const double step,
 
         for(uint16_t body=0;body<BODY_COUNT;body++) {
             y.first(dim,body)-=meanPos;
-            y.second(dim,body-=meanVelocity);
+            y.second(dim,body)-=meanVelocity;
         }
 
     }
@@ -227,9 +227,11 @@ void Simulator::simulateRK4Fixed(const double step,
         temp=y.second.chip(dim,0).mean();
         double && meanVelocity=std::move(temp(0));
 
+        std::cerr<<"Dim "<<dim<<": meanPos="<<meanPos<<", meanVelocity="<<meanVelocity<<std::endl;
+
         for(uint16_t body=0;body<BODY_COUNT;body++) {
             y.first(dim,body)-=meanPos;
-            y.second(dim,body-=meanVelocity);
+            y.second(dim,body)-=meanVelocity;
         }
 
     }

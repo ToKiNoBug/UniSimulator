@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 #ifdef TEST_BODY2DIM2
     w.runSimulaton(Simulator::Algorithm::RK4Fixed);
     w.drawConservativeCharts();
+    w.drawPathCharts();
 #endif
 
     return a.exec();
