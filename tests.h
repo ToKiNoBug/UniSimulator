@@ -7,6 +7,10 @@
 #define TEST_BODY2DIM2
 #endif
 
+#if (BODY_COUNT==2) && (DIM_COUNT==3)
+#define TEST_BODY2DIM3
+#endif
+
 void dispConstants();
 
 #ifdef TEST_BODY2DIM2

@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         auto it = pathViews.begin();
         auto dt = dimPairs.begin();
-        const uint16_t colCount=std::floor(std::sqrt(pathViews.size()));
+        const uint16_t colCount=std::ceil(std::sqrt(DIM_COUNT*(DIM_COUNT-1)/2));
         uint32_t chartOrder=0;
         for(uint16_t dimA=0;dimA<DIM_COUNT;dimA++) {
             for(uint16_t dimB=dimA+1;dimB<DIM_COUNT;dimB++) {
@@ -52,6 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
     }
+
+   setWindowTitle(QString::number(BODY_COUNT)+" Bodies in "
+                  +QString::number(DIM_COUNT)
+                  +"D Space Simulation    Made by TokiNoBug");
 
 }
 
@@ -107,6 +111,24 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     TimeSpan tSpan=std::make_pair(0*year,10*year);
 
     Time step=0.01*year;
+
+    runSimulaton(algo,step,tSpan,start,mass);
+#endif
+
+#ifdef TEST_BODY2DIM3
+    MassVector mass(3*Ms,2*Ms);
+
+    Statue start;
+    start.first.setValues({{-rs,rs},
+                                    {-0.5*rs,3*rs},
+                                    {1.2*rs,5*rs}});
+    start.second.setValues({{-0.9*vs,0.2*vs},
+                                          {-vs,0.4*vs},
+                                            {-0.3*vs,0.2*vs}});
+
+    TimeSpan tSpan=std::make_pair(0*year,10*year);
+
+    Time step=0.005*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif

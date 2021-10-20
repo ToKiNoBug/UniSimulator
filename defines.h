@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#define DIM_COUNT 2
+#define DIM_COUNT 3
 #define BODY_COUNT 2
 
 typedef Eigen::TensorFixedSize<double,
