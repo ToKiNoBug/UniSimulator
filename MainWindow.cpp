@@ -172,7 +172,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     TimeSpan tSpan=std::make_pair(0*year,50*year);
 
-    Time step=0.0001*year;
+    Time step=1e-4*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif
