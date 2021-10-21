@@ -39,6 +39,10 @@ private slots:
 
     void on_timeSlider_valueChanged(int value);
 
+    void on_timeSlider_sliderPressed();
+
+    void on_timeSlider_sliderReleased();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;

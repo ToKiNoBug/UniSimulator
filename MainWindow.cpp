@@ -180,7 +180,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     std::cout<<"starting velocity=\n"<<start.second/vs<<std::endl;
 
-    TimeSpan tSpan=std::make_pair(0*year,50*year);
+    TimeSpan tSpan=std::make_pair(0*year,100*year);
 
     Time step=1e-4*year;
 
@@ -549,5 +549,35 @@ void MainWindow::on_timeSlider_valueChanged(int value) {
     //qDebug()<<__LINE__;
     moveScatterIndex(EnergyView->chart(),value);
     moveScatterIndex(MotionView->chart(),value);
+}
+
+
+void MainWindow::on_timeSlider_sliderPressed() {
+
+    QChart::AnimationOptions op;
+
+    op.setFlag(QChart::AnimationOption::GridAxisAnimations,false);
+    op.setFlag(QChart::AnimationOption::SeriesAnimations,false);
+
+    for(auto it : pathViews) {
+        it->chart()->setAnimationOptions(op);
+    }
+    EnergyView->chart()->setAnimationOptions(op);
+    MotionView->chart()->setAnimationOptions(op);
+}
+
+
+void MainWindow::on_timeSlider_sliderReleased() {
+    QChart::AnimationOptions op;
+
+    op.setFlag(QChart::AnimationOption::GridAxisAnimations,false);
+    op.setFlag(QChart::AnimationOption::SeriesAnimations,true);
+
+    for(auto it : pathViews) {
+        it->chart()->setAnimationOptions(op);
+    }
+    EnergyView->chart()->setAnimationOptions(op);
+    MotionView->chart()->setAnimationOptions(op);
+
 }
 
