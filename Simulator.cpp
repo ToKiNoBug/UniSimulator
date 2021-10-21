@@ -145,19 +145,8 @@ void Simulator::simulateEuler(const double step,
         return;
     }
 
-    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
-        Eigen::Tensor<double,0> temp=y.first.chip(dim,0).mean();
-        double && meanPos=std::move(temp(0));
-
-        temp=y.second.chip(dim,0).mean();
-        double && meanVelocity=std::move(temp(0));
-
-        for(uint16_t body=0;body<BODY_COUNT;body++) {
-            y.first(dim,body)-=meanPos;
-            y.second(dim,body)-=meanVelocity;
-        }
-
-    }
+    positonAlign(y.first);
+    motionAlign(mass,y.second);
 
     clear();
 
@@ -221,21 +210,9 @@ void Simulator::simulateRK4Fixed(const double step,
 
     clear();
 
-    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
-        Eigen::Tensor<double,0> temp=y.first.chip(dim,0).mean();
-        double && meanPos=std::move(temp(0));
 
-        temp=y.second.chip(dim,0).mean();
-        double && meanVelocity=std::move(temp(0));
-
-        std::cerr<<"Dim "<<dim<<": meanPos="<<meanPos<<", meanVelocity="<<meanVelocity<<std::endl;
-
-        for(uint16_t body=0;body<BODY_COUNT;body++) {
-            y.first(dim,body)-=meanPos;
-            y.second(dim,body)-=meanVelocity;
-        }
-
-    }
+    positonAlign(y.first);
+    motionAlign(mass,y.second);
 
     DistanceMat safeDistance;
     calculateSafeDistance(mass,safeDistance);
@@ -255,7 +232,7 @@ void Simulator::simulateRK4Fixed(const double step,
     while (true) {
         curTime=tSpan.first+i*step;
 
-        if(curTime>tSpan.second) {
+        if(curTime>tSpan.second+step) {
             break;
         }
 
@@ -338,4 +315,85 @@ for(uint16_t dim=0;dim<DIM_COUNT;dim++)
 speed.rowwise()*=mass.transpose();
 
 dest=speed.rowwise().sum();
+}
+
+void Simulator::interPlot(const Simulator *source,
+                          Simulator *dest,
+                          const Eigen::ArrayXd & timeQueried) {
+if(source->sol.back().first<timeQueried.maxCoeff()) {
+    std::cerr<<"Error when interploting! outerplot is invalid\n";
+    std::cerr<<"source ended at time "<<source->sol.back().first
+            <<" but quried at time "<<timeQueried.maxCoeff()<<std::endl;
+    return;
+}
+
+if(source->sol.size()<=1) {
+    std::cerr<<"source's sol has fewer than 2 statues, can't interplot in such condition\n";
+    return;
+}
+
+dest->clear();
+dest->mass=source->mass;
+
+Interaction GM;
+DistanceMat safeDistance;
+calculateGM(source->mass,GM);
+calculateSafeDistance(source->mass,safeDistance);
+
+//assume that timeQueried is sorted into ascending order
+auto cur=source->sol.cbegin();
+auto next=cur;      next++;
+
+
+Point curP=*cur;
+    for(auto curTime : timeQueried)
+    {
+        while(curTime>next->first) {
+            cur++;
+            next++;
+            curP=*cur;
+            //std::cout<<"region marched a step\n";
+        }
+        /*
+        if(next==source->sol.cend()) {
+            break;
+        }*/
+        //std::cout<<"interplot time "<<curTime<<" in range ["<<cur->first<<" , "<<next->first<<"]\n";
+        double step=curTime-curP.first;
+        Simulator::RK4(step,curP.second,GM,safeDistance,curP.second);
+        curP.first=curTime;
+        dest->sol.push_back(curP);
+    }
+
+}
+
+void Simulator::motionAlign(const BodyVector &mass, Velocity &velocity) {
+    Eigen::Tensor<double,1> massTensor(mass.size());
+
+    for(uint32_t body=0;body<BODY_COUNT;body++) {
+        massTensor[body]=mass[body];
+    }
+
+    double massSum=mass.sum();
+
+    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+        Eigen::Tensor<double,0> temp=(velocity.chip(dim,0)*massTensor).sum();
+        double && deltaVelocity=temp(0)/massSum;
+
+        for(uint16_t body=0;body<BODY_COUNT;body++) {
+            velocity(dim,body)-=deltaVelocity;
+        }
+
+    }
+}
+
+void Simulator::positonAlign(Position & pos) {
+    for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+        Eigen::Tensor<double,0> temp=pos.chip(dim,0).mean();
+        double && meanPos=std::move(temp(0));
+
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            pos(dim,body)-=meanPos;
+        }
+    }
 }

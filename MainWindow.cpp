@@ -108,9 +108,9 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     start.second.setValues({{-1*vs,0},
                                           {-vs,vs}});
 
-    TimeSpan tSpan=std::make_pair(0*year,10*year);
+    TimeSpan tSpan=std::make_pair(0*year,100*year);
 
-    Time step=0.01*year;
+    Time step=0.001*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif
@@ -193,7 +193,8 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
         break;
     }
 
-    Simu=fast;
+    //Simu=fast;
+    Simulator::interPlot(&fast,&Simu,Eigen::ArrayXd::LinSpaced(512,ts.first,ts.second));
 }
 
 
