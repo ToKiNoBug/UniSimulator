@@ -18,7 +18,6 @@ extern const double year; //seconds of a year
 extern const double rs; //standard distance (1AU)
 extern const double vs; //standard speed
 extern const double as; //standard accelerate
-extern const double TimeMax; //max simulation time
 
 class Simulator
 {

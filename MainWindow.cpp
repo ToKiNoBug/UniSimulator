@@ -136,17 +136,24 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 #ifdef TEST_BODY3DIM3
     BodyVector mass(1*Ms,2*Ms,3*Ms);
 
-    mass*=10;
+    mass*=1;
 
     Statue start;
 
     Position rnd;
     rnd.setRandom();
-    auto temp1=rnd*rs;
+    for(uint32_t i=0;i<rnd.size();i++){
+        rnd(i)=2*(rnd(i)-0.5);
+    }
+    auto temp1=rnd*(10*rs);
     start.first=temp1;
 
     rnd.setRandom();
-    auto temp2=rnd*(0*vs/512);
+    for(uint32_t i=0;i<rnd.size();i++){
+        rnd(i)=2*(rnd(i)-0.5);
+    }
+
+    auto temp2=(rnd)*(vs);
     start.second=temp2;
     /*
     start.first.setValues({{rs,        0,     0},
@@ -159,13 +166,13 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     //temp.eval();
     //start.second=temp;
 
-    std::cout<<"starting position=\n"<<start.first<<std::endl;
+    std::cout<<"starting position=\n"<<start.first/rs<<std::endl;
 
-    std::cout<<"start velocity=\n"<<start.second<<std::endl;
+    std::cout<<"starting velocity=\n"<<start.second/vs<<std::endl;
 
-    TimeSpan tSpan=std::make_pair(0*year,5*year);
+    TimeSpan tSpan=std::make_pair(0*year,50*year);
 
-    Time step=0.001*year;
+    Time step=0.0001*year;
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif
@@ -192,9 +199,15 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
         std::cerr<<"Unknown simulaton algorithm\n";
         break;
     }
-
+    std::cerr<<"Simulation finished with "<<fast.getResult().size()<<" dots\n";
     //Simu=fast;
-    Simulator::deval(&fast,&Simu,Eigen::ArrayXd::LinSpaced(512,ts.first,ts.second));
+
+    double showBeg=ts.first,showEnd=std::min(ts.second,
+                                             fast.getResult().back().first);
+    uint64_t dotCount=std::max(512,int((showEnd-showBeg)*64/year));
+
+    Simulator::deval(&fast,&Simu,
+                     Eigen::ArrayXd::LinSpaced(dotCount,showBeg,showEnd));
 }
 
 

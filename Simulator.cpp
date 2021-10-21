@@ -10,7 +10,6 @@ const double year=2*M_PI/omega_s;
 const double rs=0.5*std::pow(2*G*Ms/(omega_s*omega_s),1.0/3);
 const double vs=omega_s*rs;
 const double as=omega_s*vs;
-const double TimeMax=300*year;
 const double INF=1e300;
 
 #ifdef IS_POINT_TUPLE
@@ -32,7 +31,7 @@ void Simulator::calculateSafeDistance(const BodyVector & mass,
     auto massMat=radius.replicate(1,BODY_COUNT);
 
     //dest=2.44*massMat.max(massMat.transpose());
-    dest=0.44*massMat.max(massMat.transpose());
+    dest=2.44*massMat.max(massMat.transpose());
 }
 
 void Simulator::calculateGM(const BodyVector & mass,
