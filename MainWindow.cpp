@@ -1,6 +1,16 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+const QColor DefaultColors[]={
+                       Qt::GlobalColor::blue,
+                       Qt::GlobalColor::green,
+                       Qt::GlobalColor::yellow,
+                       Qt::GlobalColor::magenta,
+                       Qt::GlobalColor::red,
+                       Qt::GlobalColor::gray,
+                       Qt::GlobalColor::cyan,
+                       Qt::GlobalColor::darkGreen};
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
@@ -28,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         auto it = pathViews.begin();
         auto dt = dimPairs.begin();
-        const uint16_t colCount=std::ceil(std::sqrt(DIM_COUNT*(DIM_COUNT-1)/2));
+        const uint16_t colCount=std::ceil(std::sqrt(pathChartCount));
         uint32_t chartOrder=0;
         for(uint16_t dimA=0;dimA<DIM_COUNT;dimA++) {
             for(uint16_t dimB=dimA+1;dimB<DIM_COUNT;dimB++) {
@@ -208,6 +218,8 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
 
     Simulator::deval(&fast,&Simu,
                      Eigen::ArrayXd::LinSpaced(dotCount,showBeg,showEnd));
+    ui->timeSlider->setMinimum(0);
+    ui->timeSlider->setMaximum(dotCount-1);
 }
 
 
@@ -278,6 +290,9 @@ void MainWindow::drawConservativeCharts() {
         MotionView->setRenderHint(QPainter::Antialiasing, true);
     }
 
+    createScatters(MotionView->chart());
+    createScatters(EnergyView->chart());
+
 }
 
 void MainWindow::addSeriesToChart(QChart * chart,
@@ -332,6 +347,14 @@ void MainWindow::addSeriesToChart(QChart * chart,
 
         series->attachAxis(xAxis);
         series->attachAxis(yAxis);
+        /*
+        QScatterSeries * dotSeries=new QScatterSeries;
+        dotSeries->clear();
+        dotSeries->append(series->at(0));
+        chart->addSeries(dotSeries);
+        dotSeries->attachAxis(xAxis);
+        dotSeries->attachAxis(yAxis);
+        dotSeries->setColor(series->color());*/
     }
 
 }
@@ -343,10 +366,10 @@ void MainWindow::drawPathCharts() {
     }
 
     std::array<std::array<QVector<QPointF>*,BODY_COUNT>,
-            DIM_COUNT*(DIM_COUNT-1)/2> chartDatas;
+            pathChartCount> chartDatas;
 
     std::array<std::array<QLineSeries *,BODY_COUNT>,
-            DIM_COUNT*(DIM_COUNT-1)/2> chartsSerieses;
+            pathChartCount> chartsSerieses;
 
     std::array<float,DIM_COUNT> posMin,posMax;//DimVector
 
@@ -455,6 +478,8 @@ void MainWindow::drawPathCharts() {
             curSeries->attachAxis(yAxis);
             delete chartDatas[chartIdx][bodyIdx];
         }
+        createScatters(curChart);
+        std::cerr<<"Line="<<__LINE__<<"chartIdx="<<chartIdx<<std::endl;
         curChart->legend()->hide();
         xAxis->setTitleText("Dim "
                             +QString::number(dim_x)
@@ -469,3 +494,60 @@ void MainWindow::drawPathCharts() {
 
 
 }
+
+void MainWindow::createScatters(QChart * chart) {
+    uint32_t dataCount=chart->series().size();
+    if(dataCount<=0)
+        return;
+
+    std::vector<QLineSeries*> series;
+    series.resize(0);
+
+    for(auto it : chart->series()) {
+        series.push_back(qobject_cast<QLineSeries*>(it));
+    }
+
+    for(uint32_t dataIdx=0;dataIdx<dataCount;dataIdx++) {
+        QScatterSeries * ss=new QScatterSeries;
+        ss->setColor(series[dataIdx]->pen().color());
+        ss->clear();
+        ss->append(series[dataIdx]->at(0));
+        chart->addSeries(ss);
+        ss->attachAxis(chart->axes(Qt::Horizontal).front());
+        ss->attachAxis(chart->axes(Qt::Vertical).front());
+    }
+}
+
+void MainWindow::moveScatterIndex(QChart * chart, int index) {
+    int dataCount=chart->series().size();
+    if((dataCount<=0)||(dataCount%2!=0))
+        return;
+    dataCount/=2;
+    QLineSeries* ls;
+    QScatterSeries* ss;
+    for(int dataIdx=0;dataIdx<dataCount;dataIdx++) {
+        ls=qobject_cast<QLineSeries*>(chart->series()[dataIdx+0*dataCount]);
+        ss=qobject_cast<QScatterSeries*>(chart->series()[dataIdx+1*dataCount]);
+        ss->clear();
+        ss->append(ls->at(index));
+        //ss->append(ls->at(std::min(index,ls->count()-1)));
+    }
+}
+
+void MainWindow::on_timeSlider_sliderMoved(int)
+{
+}
+
+void MainWindow::on_timeSlider_valueChanged(int value) {
+
+    //std::cerr<<"value="<<value<<std::endl;
+    for(auto it : pathViews) {
+        moveScatterIndex(it->chart(),value);
+    }
+
+    //return;
+    //qDebug()<<__LINE__;
+    moveScatterIndex(EnergyView->chart(),value);
+    moveScatterIndex(MotionView->chart(),value);
+}
+
