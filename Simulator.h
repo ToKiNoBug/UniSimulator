@@ -43,9 +43,9 @@ public:
 
     void clear();
 
-    void setMass(const MassVector &);
+    void setMass(const BodyVector &);
 
-    const MassVector & getMass() const;
+    const BodyVector & getMass() const;
 
     const std::list<Point> & getResult() const;
 
@@ -59,10 +59,10 @@ public:
                                                 DimVector &) const;
 
 
-    static void calculateSafeDistance(const MassVector &,
+    static void calculateSafeDistance(const BodyVector &,
                                                             DistanceMat & dest);
 
-    static void calculateGM(const MassVector &,
+    static void calculateGM(const BodyVector &,
                                                             Interaction &);
 
     static bool calculateDiff(const Position & y,
@@ -80,7 +80,7 @@ public:
 private:
     std::list<Point> sol;
 
-    MassVector mass;
+    BodyVector mass;
 
 
 };

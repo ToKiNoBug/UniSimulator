@@ -26,7 +26,7 @@ void dispConstants() {
 void testPerformance() {
 std::cerr<<"test started";
 
-MassVector M(Ms,1*Ms);
+BodyVector M(Ms,1*Ms);
 
 Statue y,dy;
 y.first.setValues({{-rs,rs},
@@ -88,7 +88,7 @@ return;
 void testDerivative() {
     std::cout<<"testDerivative\n";
 
-    MassVector M(Ms,Ms);
+    BodyVector M(Ms,Ms);
 
     Statue y;
     y.first.setValues({{-rs,rs},
@@ -122,7 +122,7 @@ void testDerivative() {
 void testSimulation() {
     std::cout<<"testSimulation\n";
 
-    MassVector M(Ms,Ms);
+    BodyVector M(Ms,Ms);
 
     Statue y;
     y.first.setValues({{-rs,rs},
@@ -169,7 +169,7 @@ void testEuler() {
 
     Simulator S;
 
-    MassVector mass(Ms,2*Ms);
+    BodyVector mass(Ms,2*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},
@@ -215,7 +215,7 @@ void testRK4Fixed() {
 
     Simulator S;
 
-    MassVector mass(Ms,2*Ms);
+    BodyVector mass(Ms,2*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},

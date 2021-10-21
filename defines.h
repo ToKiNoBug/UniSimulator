@@ -8,7 +8,7 @@
 #include <unsupported/Eigen/CXX11/Tensor>
 
 #define DIM_COUNT 3
-#define BODY_COUNT 2
+#define BODY_COUNT 3
 
 typedef Eigen::TensorFixedSize<double,
                         Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Position;
@@ -24,7 +24,7 @@ typedef Eigen::TensorFixedSize<double,
 
 typedef double Time ;
 
-typedef Eigen::Array<double,BODY_COUNT,1> MassVector ;
+typedef Eigen::Array<double,BODY_COUNT,1> BodyVector ;
 
 typedef Eigen::Array<double,DIM_COUNT,1> DimVector ;
 

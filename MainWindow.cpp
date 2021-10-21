@@ -100,7 +100,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 #ifdef TEST_BODY2DIM2
-    MassVector mass(Ms,2*Ms);
+    BodyVector mass(Ms,2*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},
@@ -116,7 +116,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 #endif
 
 #ifdef TEST_BODY2DIM3
-    MassVector mass(3*Ms,2*Ms);
+    BodyVector mass(3*Ms,2*Ms);
 
     Statue start;
     start.first.setValues({{-rs,rs},
@@ -132,13 +132,50 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     runSimulaton(algo,step,tSpan,start,mass);
 #endif
+
+#ifdef TEST_BODY3DIM3
+    BodyVector mass(1*Ms,2*Ms,3*Ms);
+
+    mass*=10;
+
+    Statue start;
+
+    Position rnd;
+    rnd.setRandom();
+    auto temp1=rnd*rs;
+    start.first=temp1;
+
+    rnd.setRandom();
+    auto temp2=rnd*(0*vs/512);
+    start.second=temp2;
+    /*
+    start.first.setValues({{rs,        0,     0},
+                                    {0,         rs,     0},
+                                    {0,         0,      rs}});
+    start.second.setValues({{vs,    0,    0},
+                                           {0,     vs,   0},
+                                           {0,      0,      vs}});
+    */
+    //temp.eval();
+    //start.second=temp;
+
+    std::cout<<"starting position=\n"<<start.first<<std::endl;
+
+    std::cout<<"start velocity=\n"<<start.second<<std::endl;
+
+    TimeSpan tSpan=std::make_pair(0*year,5*year);
+
+    Time step=0.001*year;
+
+    runSimulaton(algo,step,tSpan,start,mass);
+#endif
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo,
                                                        const double h,
                                                        const TimeSpan & ts,
                                                        const Statue & s,
-                                                       const MassVector & mv,
+                                                       const BodyVector & mv,
                                                        bool * noCollide) {
     Simulator fast=Simu;
 

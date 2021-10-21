@@ -26,7 +26,7 @@ public:
                       const double,
                       const TimeSpan &,
                       const Statue &,
-                      const MassVector &,
+                      const BodyVector &,
                       bool * noCollide=nullptr);
 
     void drawConservativeCharts();

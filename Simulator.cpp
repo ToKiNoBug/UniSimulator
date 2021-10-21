@@ -24,17 +24,18 @@ Simulator::Simulator() {
 sol.clear();
 }
 
-void Simulator::calculateSafeDistance(const MassVector & mass,
+void Simulator::calculateSafeDistance(const BodyVector & mass,
                                                                 DistanceMat &dest) {
     //dest.setZero();
 
-    MassVector radius=(3*mass/(4*M_PI*rho)).pow(1.0/3);
+    BodyVector radius=(3*mass/(4*M_PI*rho)).pow(1.0/3);
     auto massMat=radius.replicate(1,BODY_COUNT);
 
-    dest=2.44*massMat.max(massMat.transpose());
+    //dest=2.44*massMat.max(massMat.transpose());
+    dest=0.44*massMat.max(massMat.transpose());
 }
 
-void Simulator::calculateGM(const MassVector & mass,
+void Simulator::calculateGM(const BodyVector & mass,
                            Interaction & GM) {
 
 for(int i=0;i<GM.dimension(1);i++) {
@@ -274,11 +275,11 @@ void Simulator::simulateRK4Fixed(const double step,
 }
 
 
-void Simulator::setMass(const MassVector & _mass) {
+void Simulator::setMass(const BodyVector & _mass) {
     mass=_mass;
 }
 
-const MassVector & Simulator::getMass() const {
+const BodyVector & Simulator::getMass() const {
     return mass;
 }
 
@@ -289,7 +290,7 @@ const std::list<Point> & Simulator::getResult() const {
 double Simulator::calculateKinetic(const std::_List_const_iterator<Point> it) const {
     Eigen::Tensor<double,1> speedSquare
             =it->second.second.square().sum(Eigen::array<int,1>({0}));
-    MassVector v;
+    BodyVector v;
     for(uint16_t i=0;i<BODY_COUNT;i++) {
         v(i)=speedSquare(i)/2;
     }
