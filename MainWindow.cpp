@@ -194,7 +194,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     }
 
     //Simu=fast;
-    Simulator::interPlot(&fast,&Simu,Eigen::ArrayXd::LinSpaced(512,ts.first,ts.second));
+    Simulator::deval(&fast,&Simu,Eigen::ArrayXd::LinSpaced(512,ts.first,ts.second));
 }
 
 

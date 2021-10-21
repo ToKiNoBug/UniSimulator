@@ -317,7 +317,7 @@ speed.rowwise()*=mass.transpose();
 dest=speed.rowwise().sum();
 }
 
-void Simulator::interPlot(const Simulator *source,
+void Simulator::deval(const Simulator *source,
                           Simulator *dest,
                           const Eigen::ArrayXd & timeQueried) {
 if(source->sol.back().first<timeQueried.maxCoeff()) {

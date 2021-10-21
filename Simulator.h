@@ -77,7 +77,7 @@ public:
                     const DistanceMat& ,
                     Statue & y_n1);
 
-    static void interPlot(const Simulator * source,
+    static void deval(const Simulator * source,
             Simulator * dest,
                           const Eigen::ArrayXd & timeQueried);
     static void motionAlign(const BodyVector & mass, Velocity & velocity);
