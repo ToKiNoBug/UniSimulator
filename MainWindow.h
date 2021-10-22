@@ -8,6 +8,8 @@
 
 #include "tests.h"
 
+//#define SIMU_INTERPOLT
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -35,13 +37,15 @@ public:
     void drawPathCharts();
 
 private slots:
-    void on_timeSlider_sliderMoved(int position);
-
     void on_timeSlider_valueChanged(int value);
 
     void on_timeSlider_sliderPressed();
 
     void on_timeSlider_sliderReleased();
+
+    void on_cbShowCurves_stateChanged(int arg1);
+
+    void on_cbShowDots_stateChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -56,6 +60,6 @@ private:
     static void addSeriesToChart(QChart *,QList<QVector<QPointF>>&,
                                  int * =nullptr);
     static void createScatters(QChart*);
-    static void moveScatterIndex(QChart*,int index);
+    static QPointF moveScatterIndex(QChart*,int index);
 };
 #endif // MAINWINDOW_H

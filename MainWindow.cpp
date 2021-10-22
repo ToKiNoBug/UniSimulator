@@ -118,7 +118,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     start.second.setValues({{-1*vs,0},
                                           {-vs,vs}});
 
-    TimeSpan tSpan=std::make_pair(0*year,100*year);
+    TimeSpan tSpan=std::make_pair(0*year,10*year);
 
     Time step=0.001*year;
 
@@ -210,14 +210,21 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
         break;
     }
     std::cerr<<"Simulation finished with "<<fast.getResult().size()<<" dots\n";
-    //Simu=fast;
+    //
 
-    double showBeg=ts.first,showEnd=std::min(ts.second,
-                                             fast.getResult().back().first);
-    uint64_t dotCount=std::max(512,int((showEnd-showBeg)*64/year));
+    uint64_t dotCount;
+#ifdef SIMU_INTERPOLT
+    double showBeg,showEnd;
+    showBeg=ts.first;
+    showEnd=std::min(ts.second,fast.getResult().back().first);
+    dotCount=std::max(512,int((showEnd-showBeg)*64/year));
 
     Simulator::deval(&fast,&Simu,
                      Eigen::ArrayXd::LinSpaced(dotCount,showBeg,showEnd));
+#else
+    Simu=fast;
+    dotCount=fast.getResult().size();
+#endif
     ui->timeSlider->setMinimum(0);
     ui->timeSlider->setMaximum(dotCount-1);
 }
@@ -249,9 +256,9 @@ void MainWindow::drawConservativeCharts() {
     for(auto it=result->cbegin();it!=result->cend();it++) {
         double yearTime=it->first/year;
         energyHead.push_back(QPointF(yearTime,
-                                 Simu.calculateEnergy(it)));
+                                 Simu.calculateEnergy(&*it)));
         DimVector motionVal;
-        Simu.calculateTotalMotion(it,motionVal);
+        Simu.calculateTotalMotion(&*it,motionVal);
         for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
             motions[dim].push_back(QPointF(yearTime,motionVal[dim]));
         }
@@ -347,14 +354,6 @@ void MainWindow::addSeriesToChart(QChart * chart,
 
         series->attachAxis(xAxis);
         series->attachAxis(yAxis);
-        /*
-        QScatterSeries * dotSeries=new QScatterSeries;
-        dotSeries->clear();
-        dotSeries->append(series->at(0));
-        chart->addSeries(dotSeries);
-        dotSeries->attachAxis(xAxis);
-        dotSeries->attachAxis(yAxis);
-        dotSeries->setColor(series->color());*/
     }
 
 }
@@ -518,24 +517,22 @@ void MainWindow::createScatters(QChart * chart) {
     }
 }
 
-void MainWindow::moveScatterIndex(QChart * chart, int index) {
+QPointF MainWindow::moveScatterIndex(QChart * chart, int index) {
     int dataCount=chart->series().size();
     if((dataCount<=0)||(dataCount%2!=0))
-        return;
+        return QPointF();
     dataCount/=2;
     QLineSeries* ls;
     QScatterSeries* ss;
+    QPointF result;
     for(int dataIdx=0;dataIdx<dataCount;dataIdx++) {
         ls=qobject_cast<QLineSeries*>(chart->series()[dataIdx+0*dataCount]);
         ss=qobject_cast<QScatterSeries*>(chart->series()[dataIdx+1*dataCount]);
         ss->clear();
-        ss->append(ls->at(index));
+        ss->append(result=ls->at(index));
         //ss->append(ls->at(std::min(index,ls->count()-1)));
     }
-}
-
-void MainWindow::on_timeSlider_sliderMoved(int)
-{
+    return result;
 }
 
 void MainWindow::on_timeSlider_valueChanged(int value) {
@@ -547,8 +544,9 @@ void MainWindow::on_timeSlider_valueChanged(int value) {
 
     //return;
     //qDebug()<<__LINE__;
-    moveScatterIndex(EnergyView->chart(),value);
     moveScatterIndex(MotionView->chart(),value);
+    QPointF p=moveScatterIndex(EnergyView->chart(),value);
+    ui->displayTime->setText("Time : "+QString::number(p.x())+" year(s)");
 }
 
 
@@ -579,5 +577,78 @@ void MainWindow::on_timeSlider_sliderReleased() {
     EnergyView->chart()->setAnimationOptions(op);
     MotionView->chart()->setAnimationOptions(op);
 
+}
+
+void MainWindow::on_cbShowCurves_stateChanged(int arg1) {
+    std::list<QAbstractSeries*> series;
+
+    series.resize(0);
+
+    for(auto it : pathViews) {
+        //=it->chart()->series();
+        QList<QAbstractSeries*> temp=it->chart()->series();
+        for(auto jt : temp) {
+            if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeLine) {
+                series.push_back(jt);
+            }
+        }
+    }
+
+    for(auto jt : EnergyView->chart()->series()) {
+        if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeLine) {
+            series.push_back(jt);
+        }
+    }
+
+    for(auto jt : MotionView->chart()->series()) {
+        if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeLine) {
+            series.push_back(jt);
+        }
+    }
+
+    for(auto jt : series) {
+            if(arg1) {
+                jt->show();
+            } else {
+                jt->hide();
+            }
+    }
+
+}
+
+void MainWindow::on_cbShowDots_stateChanged(int arg1) {
+    std::list<QAbstractSeries*> series;
+
+    series.resize(0);
+
+    for(auto it : pathViews) {
+        //=it->chart()->series();
+        QList<QAbstractSeries*> temp=it->chart()->series();
+        for(auto jt : temp) {
+            if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeScatter) {
+                series.push_back(jt);
+            }
+        }
+    }
+
+    for(auto jt : EnergyView->chart()->series()) {
+        if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeScatter) {
+            series.push_back(jt);
+        }
+    }
+
+    for(auto jt : MotionView->chart()->series()) {
+        if(jt->type()==QAbstractSeries::SeriesType::SeriesTypeScatter) {
+            series.push_back(jt);
+        }
+    }
+
+    for(auto jt : series) {
+            if(arg1) {
+                jt->show();
+            } else {
+                jt->hide();
+            }
+    }
 }
 

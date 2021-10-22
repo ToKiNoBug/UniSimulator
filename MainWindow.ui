@@ -15,7 +15,43 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="2" column="1">
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="1" column="0">
+     <widget class="QLabel" name="displayTime">
+      <property name="minimumSize">
+       <size>
+        <width>125</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Time:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QCheckBox" name="cbShowDots">
+      <property name="text">
+       <string>Show Dots</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QCheckBox" name="cbShowCurves">
+      <property name="text">
+       <string>Show Curves</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
      <widget class="QSlider" name="timeSlider">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -25,7 +61,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0" colspan="3">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -74,19 +110,6 @@
         </property>
        </layout>
       </widget>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="displayTime">
-      <property name="minimumSize">
-       <size>
-        <width>125</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Time:</string>
-      </property>
      </widget>
     </item>
    </layout>

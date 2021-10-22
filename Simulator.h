@@ -27,6 +27,7 @@ public:
     enum Algorithm {
         Euler,
         RK4Fixed,
+        RK4Var1,
         //ODE45
     };
 
@@ -40,6 +41,11 @@ public:
                           Statue,
                           bool * noCollide=nullptr);
 
+    void simulateRK4Var1(double,
+                         TimeSpan,
+                         Statue,
+                         bool * noCollide=nullptr);
+
     void clear();
 
     void setMass(const BodyVector &);
@@ -48,13 +54,13 @@ public:
 
     const std::list<Point> & getResult() const;
 
-    double calculateKinetic(const std::_List_const_iterator<Point>) const;
+    double calculateKinetic(const Point*) const;
 
-    double calculatePotential(const std::_List_const_iterator<Point>) const;
+    double calculatePotential(const Point* it) const;
 
-    double calculateEnergy(const std::_List_const_iterator<Point>) const;
+    double calculateEnergy(const Point* it) const;
 
-    void calculateTotalMotion(const std::_List_const_iterator<Point>,
+    void calculateTotalMotion(const Point* it,
                                                 DimVector &) const;
 
 
@@ -75,6 +81,10 @@ public:
                     const Interaction &,
                     const DistanceMat& ,
                     Statue & y_n1);
+
+    static bool isErrorTolerantable(const Statue & y_h,
+                                    const Statue & y_h_2,
+                                    double errorRatio=1e-4);
 
     static void deval(const Simulator * source,
             Simulator * dest,

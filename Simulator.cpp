@@ -102,7 +102,11 @@ Position temp;
 
 k1.first=y_n.second;
 isOk=calculateDiff(y_n.first,GM,safeDistance,k1.second);
-if(!isOk) return false;
+if(!isOk) {
+    y_n1.second.setConstant(INF);
+    //make error extremely obvious when collide happens
+    return false;
+}
 
 k2.first=y_n.second+halfStep*k1.second;
 temp=y_n.first+halfStep*k1.first;
@@ -250,6 +254,118 @@ void Simulator::simulateRK4Fixed(const double step,
     }
 }
 
+void Simulator::simulateRK4Var1(double step,
+                                TimeSpan tSpan, Statue y, bool *noCollide) {
+    if(tSpan.second==tSpan.first) {
+        std::cerr<<"the begging time shouldn't equal to end time\n";
+        return;
+    }
+
+    if(tSpan.second<tSpan.first) {
+        std::swap(tSpan.first,tSpan.second);
+    }
+
+    if(tSpan.second-tSpan.first<step) {
+        std::cerr<<"time span should be greater than time step\n";
+        return;
+    }
+
+    clear();
+
+    positonAlign(y.first);
+    motionAlign(mass,y.second);
+
+    DistanceMat safeDistance;
+    calculateSafeDistance(mass,safeDistance);
+
+    Interaction GM;
+    calculateGM(mass,GM);
+
+    Acceleration acc;
+    Time curTime=tSpan.first;
+
+    Statue y_h,y_h_2;
+
+    static const double searchRatio=0.8;
+    static const int rank=4;
+    static const double ratio=std::pow(2,rank)-1;
+
+    while(true) {
+        sol.push_back(std::make_pair(curTime,y));
+
+        if(curTime>tSpan.second) {
+            break;
+        }
+
+        bool isOk=true;
+
+        isOk=RK4(step,y,GM,safeDistance,y_h);
+        //if(!isOk) { if(noCollide!=nullptr) {*noCollide=isOk; }break;}
+
+        isOk=RK4(step/2,y,GM,safeDistance,y_h_2);
+
+        isOk=RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
+
+        if(isErrorTolerantable(y_h,y_h_2)) {
+            //error is tolerantable, scale up until next value is untolerantable
+            while(true) {
+                step/=searchRatio;
+                RK4(step,y,GM,safeDistance,y_h);
+                RK4(step/2,y,GM,safeDistance,y_h_2);
+                RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
+                if(!isErrorTolerantable(y_h,y_h_2)) {
+                    step*=searchRatio;
+                    RK4(step,y,GM,safeDistance,y_h);
+                    RK4(step/2,y,GM,safeDistance,y_h_2);
+                    RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
+                    break;
+                }
+            }
+        } else {
+            while(true) {
+                step*=searchRatio;
+                RK4(step,y,GM,safeDistance,y_h);
+                RK4(step/2,y,GM,safeDistance,y_h_2);
+                RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
+                if(isErrorTolerantable(y_h,y_h_2)) {
+                    break;
+                }
+            }
+        }
+
+        Statue yh2_error;
+        yh2_error.first=(y_h_2.first-y_h.first)/ratio;
+        yh2_error.second=(y_h_2.second-y_h.second)/ratio;
+
+        y.first=y_h_2.first+yh2_error.first;
+        y.second=y_h_2.second+yh2_error.second;
+        curTime+=step;
+
+    }
+
+}
+
+bool Simulator::isErrorTolerantable(const Statue &y_h,
+                                    const Statue &y_h_2,
+                                    double errorRatio) {
+    static const int rank=4;
+    static const double ratio=std::pow(2,rank)-1;
+
+    errorRatio*=ratio;
+
+    bool isTolerantable=true;
+    auto posError=(y_h_2.first-y_h.first).abs();
+
+    Eigen::Tensor<bool,0> temp=(posError>=(errorRatio*rs)).any();
+    isTolerantable=isTolerantable&&temp(0);
+    if(!isTolerantable)
+        return false;
+    auto velocityError=(y_h_2.second-y_h.second).abs();
+    temp=(velocityError>=(errorRatio*vs)).any();
+    isTolerantable=isTolerantable&&temp(0);
+
+    return isTolerantable;
+}
 
 void Simulator::setMass(const BodyVector & _mass) {
     mass=_mass;
@@ -263,7 +379,7 @@ const std::list<Point> & Simulator::getResult() const {
     return sol;
 }
 
-double Simulator::calculateKinetic(const std::_List_const_iterator<Point> it) const {
+double Simulator::calculateKinetic(const Point* it) const {
     Eigen::Tensor<double,1> speedSquare
             =it->second.second.square().sum(Eigen::array<int,1>({0}));
     BodyVector v;
@@ -274,7 +390,7 @@ double Simulator::calculateKinetic(const std::_List_const_iterator<Point> it) co
     return (v*mass).sum();
 }
 
-double Simulator::calculatePotential(const std::_List_const_iterator<Point> it) const {
+double Simulator::calculatePotential(const Point* it) const {
     DistanceMat realDistance;
 
     realDistance.setZero();
@@ -299,11 +415,11 @@ double Simulator::calculatePotential(const std::_List_const_iterator<Point> it) 
     return realDistance.sum()/2;
 }
 
-double Simulator::calculateEnergy(const std::_List_const_iterator<Point> it) const {
+double Simulator::calculateEnergy(const Point* it) const {
     return calculateKinetic(it)+calculatePotential(it);
 }
 
-void Simulator::calculateTotalMotion(const std::_List_const_iterator<Point> it,
+void Simulator::calculateTotalMotion(const Point* it,
                           DimVector & dest) const {
 Eigen::Array<double,DIM_COUNT,BODY_COUNT> speed;
 for(uint16_t dim=0;dim<DIM_COUNT;dim++)
