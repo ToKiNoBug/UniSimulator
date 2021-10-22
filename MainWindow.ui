@@ -74,7 +74,7 @@
         <item row="3" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0" rowspan="2">
-           <widget class="QGroupBox" name="groupBox_4">
+           <widget class="QGroupBox" name="timeBox">
             <property name="title">
              <string>Time (year=)</string>
             </property>
@@ -144,7 +144,7 @@
            </widget>
           </item>
           <item row="0" column="1" rowspan="2">
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="BtnRunSimulation">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -160,9 +160,9 @@ Simulation</string>
          </layout>
         </item>
         <item row="1" column="0" rowspan="2">
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="positionBox">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -174,9 +174,9 @@ Simulation</string>
          </widget>
         </item>
         <item row="1" column="1" rowspan="2">
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="velocityBox">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -188,7 +188,7 @@ Simulation</string>
          </widget>
         </item>
         <item row="0" column="0" colspan="2">
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="massBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -196,7 +196,7 @@ Simulation</string>
            </sizepolicy>
           </property>
           <property name="title">
-           <string>Mass (Ms=2^30 kg)</string>
+           <string>Mass (Ms=)</string>
           </property>
           <layout class="QGridLayout" name="massArea"/>
          </widget>

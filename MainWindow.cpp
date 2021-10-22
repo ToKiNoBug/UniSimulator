@@ -33,8 +33,6 @@ const QColor DefaultColors[]={
                        Qt::GlobalColor::cyan,
                        Qt::GlobalColor::darkGreen};
 
-#include "WidgetCodes.cpp"
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
@@ -43,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     buildMotionEnergyUI();
 
     buildPathUI();
+
+    buildParameterUI();
 
    setWindowTitle(QString::number(BODY_COUNT)+" Bodies in "
                   +QString::number(DIM_COUNT)
@@ -297,3 +297,5 @@ void MainWindow::on_cbShowDots_stateChanged(int arg1) {
             }
     }
 }
+
+#include "WidgetCodes.cpp"

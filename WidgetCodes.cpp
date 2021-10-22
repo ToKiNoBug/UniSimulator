@@ -138,10 +138,10 @@ void MainWindow::drawConservativeCharts() {
     {
         int yPower;
 
-        qDebug()<<__LINE__;
+        //qDebug()<<__LINE__;
         addSeriesToChart(MotionView->chart(),
                          motions,&yPower);
-        qDebug()<<__LINE__;
+        //qDebug()<<__LINE__;
         MotionView->chart()->legend()->setAlignment(Qt::AlignmentFlag::AlignRight);
         MotionView->chart()->axes(Qt::Horizontal).first()->setTitleText("Time (year)");
         MotionView->chart()->axes(Qt::Vertical).first()->setTitleText(
@@ -200,11 +200,11 @@ void MainWindow::addSeriesToChart(QChart * chart,
     QValueAxis * xAxis=qobject_cast<QValueAxis *>(chart->axes(Qt::Horizontal).first());
     QValueAxis * yAxis=qobject_cast<QValueAxis *>(chart->axes(Qt::Vertical).first());
 
-    qDebug()<<__LINE__;
+    //qDebug()<<__LINE__;
         xAxis->setRange(xmin,xmax);
         yAxis->setRange(ymin,ymax);
 
-    qDebug()<<__LINE__;
+    //qDebug()<<__LINE__;
     for(uint16_t d=0;d<data.size();d++) {
         QLineSeries * series=new QLineSeries;
         series->replace(data[d]);
@@ -336,7 +336,7 @@ void MainWindow::drawPathCharts() {
             delete chartDatas[chartIdx][bodyIdx];
         }
         createScatters(curChart);
-        std::cerr<<"Line="<<__LINE__<<"chartIdx="<<chartIdx<<std::endl;
+        //std::cerr<<"Line="<<__LINE__<<"chartIdx="<<chartIdx<<std::endl;
         curChart->legend()->hide();
         xAxis->setTitleText("Dim "
                             +QString::number(dim_x)
@@ -391,6 +391,38 @@ QPointF MainWindow::moveScatterIndex(QChart * chart, int index) {
         //ss->append(ls->at(std::min(index,ls->count()-1)));
     }
     return result;
+}
+
+void MainWindow::buildParameterUI() {
+
+    ui->massBox->setTitle("Mass ( Ms="+QString::number(Ms)+"kg )");
+    for(uint32_t body=0;body<BODY_COUNT;body++) {
+        QLabel * curLabel=new QLabel;
+        curLabel->setText("M"+QString::number(body)+"=");
+        ui->massArea->addWidget(curLabel,0,2*body);
+        QLineEdit * curWidget=new QLineEdit;
+        ui->massArea->addWidget(curWidget,0,2*body+1);
+    }
+
+    ui->positionBox->setTitle("Position ( rs="+QString::number(rs)+"m )");
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            QLineEdit * curWidget=new QLineEdit;
+            ui->positionArea->addWidget(curWidget,dim,body);
+            positionWidgets[dim][body]=curWidget;
+        }
+    }
+
+    ui->velocityBox->setTitle("Velocity ( vs="+QString::number(vs)+"m/s )");
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            QLineEdit * curWidget=new QLineEdit;
+            ui->velocityArea->addWidget(curWidget,dim,body);
+            velocityWidgets[dim][body]=curWidget;
+        }
+    }
+
+    ui->timeBox->setTitle("Time ( year="+QString::number(year)+"s )");
 }
 
 #endif
