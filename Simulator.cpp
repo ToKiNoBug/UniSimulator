@@ -125,7 +125,7 @@ Position temp;
 k1.first=y_n.second;
 isOk=calculateDiff(y_n.first,GM,safeDistance,k1.second);
 if(!isOk) {
-    y_n1.second.setConstant(INF);
+    //y_n1.second.setConstant(INF);
     //make error extremely obvious when collide happens
     return false;
 }
@@ -321,10 +321,16 @@ void Simulator::simulateRK4Var1(double step,
 
         double minStep=16*std::nextafter(curTime,curTime*2)-16*curTime;
 
-        //bool isOk=true;
+        bool isOk=true;
 
-        RK4(step,y,GM,safeDistance,y_h);
-        //if(!isOk) { if(noCollide!=nullptr) {*noCollide=isOk; }break;}
+        isOk=RK4(step,y,GM,safeDistance,y_h);
+        if(!isOk) {
+            if(noCollide!=nullptr) {
+                *noCollide=isOk;
+            }
+            std::cerr<<"stars will collide (Line"<<__LINE__<<")\n";
+            break;
+        }
 
         RK4(step/2,y,GM,safeDistance,y_h_2);
 
