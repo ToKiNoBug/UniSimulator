@@ -8,7 +8,7 @@
 
 #include "tests.h"
 
-//#define SIMU_INTERPOLT
+#define SIMU_INTERPOLT
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

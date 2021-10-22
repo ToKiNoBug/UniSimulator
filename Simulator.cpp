@@ -297,6 +297,8 @@ void Simulator::simulateRK4Var1(double step,
             break;
         }
 
+        double minStep=16*std::nextafter(curTime,curTime*2)-16*curTime;
+
         bool isOk=true;
 
         isOk=RK4(step,y,GM,safeDistance,y_h);
@@ -310,6 +312,7 @@ void Simulator::simulateRK4Var1(double step,
             //error is tolerantable, scale up until next value is untolerantable
             while(true) {
                 step/=searchRatio;
+                //std::cerr<<"step increasing to "<<step<<std::endl;
                 RK4(step,y,GM,safeDistance,y_h);
                 RK4(step/2,y,GM,safeDistance,y_h_2);
                 RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
@@ -324,6 +327,14 @@ void Simulator::simulateRK4Var1(double step,
         } else {
             while(true) {
                 step*=searchRatio;
+                //std::cerr<<"step shrinking to "<<step<<std::endl;
+                if(step<=minStep) {
+                    if(noCollide!=nullptr) {
+                        *noCollide=false;
+                    }
+                    std::cerr<<"stars will collide\n";
+                    break;
+                }
                 RK4(step,y,GM,safeDistance,y_h);
                 RK4(step/2,y,GM,safeDistance,y_h_2);
                 RK4(step/2,y_h_2,GM,safeDistance,y_h_2);
@@ -332,7 +343,7 @@ void Simulator::simulateRK4Var1(double step,
                 }
             }
         }
-
+        //std::cerr<<"step accepted ="<<step<<std::endl;
         Statue yh2_error;
         yh2_error.first=(y_h_2.first-y_h.first)/ratio;
         yh2_error.second=(y_h_2.second-y_h.second)/ratio;
@@ -357,12 +368,12 @@ bool Simulator::isErrorTolerantable(const Statue &y_h,
     auto posError=(y_h_2.first-y_h.first).abs();
 
     Eigen::Tensor<bool,0> temp=(posError>=(errorRatio*rs)).any();
-    isTolerantable=isTolerantable&&temp(0);
+    isTolerantable=!temp(0);
     if(!isTolerantable)
         return false;
     auto velocityError=(y_h_2.second-y_h.second).abs();
     temp=(velocityError>=(errorRatio*vs)).any();
-    isTolerantable=isTolerantable&&temp(0);
+    isTolerantable=!temp(0);
 
     return isTolerantable;
 }

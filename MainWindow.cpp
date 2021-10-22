@@ -205,9 +205,12 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     case Simulator::Algorithm::RK4Fixed:
         fast.simulateRK4Fixed(h,ts,s,noCollide);
         break;
+    case Simulator::Algorithm::RK4Var1:
+        fast.simulateRK4Var1(h,ts,s,noCollide);
+        break;
     default:
         std::cerr<<"Unknown simulaton algorithm\n";
-        break;
+        return;
     }
     std::cerr<<"Simulation finished with "<<fast.getResult().size()<<" dots\n";
     //
@@ -217,7 +220,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     double showBeg,showEnd;
     showBeg=ts.first;
     showEnd=std::min(ts.second,fast.getResult().back().first);
-    dotCount=std::max(512,int((showEnd-showBeg)*64/year));
+    dotCount=std::max(512,int((showEnd-showBeg)*32/year));
 
     Simulator::deval(&fast,&Simu,
                      Eigen::ArrayXd::LinSpaced(dotCount,showBeg,showEnd));
@@ -225,6 +228,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     Simu=fast;
     dotCount=fast.getResult().size();
 #endif
+    std::cerr<<"curve displayed with "<<dotCount<<" dots\n";
     ui->timeSlider->setMinimum(0);
     ui->timeSlider->setMaximum(dotCount-1);
 }
