@@ -84,7 +84,7 @@ public:
 
     static bool isErrorTolerantable(const Statue & y_h,
                                     const Statue & y_h_2,
-                                    double errorRatio=1e-6);
+                                    double errorRatio=1e-8);
 
     static void deval(const Simulator * source,
             Simulator * dest,
