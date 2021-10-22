@@ -76,6 +76,14 @@ private:
     QChartView * EnergyView;
     std::array<QChartView * ,pathChartCount> pathViews;
     std::array<std::pair<uint16_t,uint16_t>,pathChartCount> dimPairs;
+    std::array<QLineEdit*,BODY_COUNT> massWidgets;
+    std::array<std::array<QLineEdit*,BODY_COUNT>,DIM_COUNT> positonWidgets;
+    std::array<std::array<QLineEdit*,BODY_COUNT>,DIM_COUNT> velocityWidgets;
+
+    void buildMotionEnergyUI();
+    void buildPathUI();
+    void buildParameterUI();
+    void setRandomParameters();
 
     static QChart * createEmptyChart();
 

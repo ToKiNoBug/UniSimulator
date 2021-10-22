@@ -12,6 +12,7 @@ INCLUDEPATH += D:/CppLibs/eigen-3.4.0
 
 SOURCES += \
     Simulator.cpp \
+    WidgetCodes.cpp \
     main.cpp \
     MainWindow.cpp \
     tests.cpp

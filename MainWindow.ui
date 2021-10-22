@@ -18,6 +18,16 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item row="1" column="1">
+     <widget class="QCheckBox" name="cbShowCurves">
+      <property name="text">
+       <string>Show Curves</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="displayTime">
       <property name="minimumSize">
@@ -31,26 +41,6 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QCheckBox" name="cbShowDots">
-      <property name="text">
-       <string>Show Dots</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QCheckBox" name="cbShowCurves">
-      <property name="text">
-       <string>Show Curves</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="0" colspan="3">
      <widget class="QSlider" name="timeSlider">
       <property name="orientation">
@@ -61,11 +51,158 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="2">
+     <widget class="QCheckBox" name="cbShowDots">
+      <property name="text">
+       <string>Show Dots</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0" colspan="3">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <widget class="QWidget" name="parameters">
+       <attribute name="title">
+        <string>Parameters</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="3" column="0" colspan="2">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0" rowspan="2">
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>Time (year=)</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="inputStep">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLineEdit" name="inputEndTime">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Begin:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="inputBeginTime">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>End:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Step:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QComboBox" name="selectAlgorithm"/>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Algorithm:</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1" rowspan="2">
+           <widget class="QPushButton" name="pushButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Run
+Simulation</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" rowspan="2">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>Position (rs=)</string>
+          </property>
+          <layout class="QGridLayout" name="positionArea"/>
+         </widget>
+        </item>
+        <item row="1" column="1" rowspan="2">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>Velocity (vs=)</string>
+          </property>
+          <layout class="QGridLayout" name="velocityArea"/>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>Mass (Ms=2^30 kg)</string>
+          </property>
+          <layout class="QGridLayout" name="massArea"/>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="dynamicArea">
        <attribute name="title">
         <string>Dynamic</string>
