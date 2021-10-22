@@ -26,9 +26,9 @@ This file is part of ThreeBodySimulation.
 //const Eigen::Index DimCount=3;
 const double G=6.67259e-11;
 const double Ms=2e30;
-const double omega_s=2e-7;
+const double year=365*24*60*60;
+const double omega_s=2*M_PI/year;
 const double rho=1.409e3;
-const double year=2*M_PI/omega_s;
 const double rs=0.5*std::pow(2*G*Ms/(omega_s*omega_s),1.0/3);
 const double vs=omega_s*rs;
 const double as=omega_s*vs;

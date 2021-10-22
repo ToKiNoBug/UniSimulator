@@ -68,7 +68,6 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     Time step=0.001*year;
 
-    runSimulaton(algo,step,tSpan,start,mass);
 #endif
 
 #ifdef TEST_BODY2DIM3
@@ -86,7 +85,6 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     Time step=0.005*year;
 
-    runSimulaton(algo,step,tSpan,start,mass);
 #endif
 
 #ifdef TEST_BODY3DIM3
@@ -130,8 +128,9 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
     Time step=1e-4*year;
 
-    runSimulaton(algo,step,tSpan,start,mass);
 #endif
+    setParamaters(mass,start,tSpan,step,algo);
+    runSimulaton(algo,step,tSpan,start,mass);
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo,

@@ -401,6 +401,7 @@ void MainWindow::buildParameterUI() {
         curLabel->setText("M"+QString::number(body)+"=");
         ui->massArea->addWidget(curLabel,0,2*body);
         QLineEdit * curWidget=new QLineEdit;
+        massWidgets[body]=curWidget;
         ui->massArea->addWidget(curWidget,0,2*body+1);
     }
 
@@ -423,6 +424,53 @@ void MainWindow::buildParameterUI() {
     }
 
     ui->timeBox->setTitle("Time ( year="+QString::number(year)+"s )");
+
+    ui->selectAlgorithm->addItem("Euler",Simulator::Algorithm::Euler);
+    ui->selectAlgorithm->addItem("RK4Fixed",Simulator::Algorithm::RK4Fixed);
+    ui->selectAlgorithm->addItem("RK4Var1",Simulator::Algorithm::RK4Var1);
+}
+
+void MainWindow::setParamaters(const BodyVector & mass,
+                                const Statue & y0,
+                               TimeSpan ts,
+                               double step,
+                               Simulator::Algorithm algo) {
+    for(uint32_t body=0;body<BODY_COUNT;body++) {
+        massWidgets[body]->setText(QString::number(mass[body]/Ms));
+    }
+
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            positionWidgets[dim][body]->setText(QString::number(y0.first(dim,body)/rs));
+        }
+    }
+
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            velocityWidgets[dim][body]->setText(QString::number(y0.second(dim,body)/vs));
+        }
+    }
+
+    ui->inputBeginTime->setText(QString::number(ts.first/year));
+    ui->inputEndTime->setText(QString::number(ts.second/year));
+    ui->inputStep->setText(QString::number(step/year));
+
+    uint16_t selectedIdx=0;
+    switch (algo) {
+    case Simulator::Algorithm::Euler:
+        selectedIdx=0;
+        break;
+    case Simulator::Algorithm::RK4Fixed:
+        selectedIdx=1;
+        break;
+    case Simulator::Algorithm::RK4Var1:
+        selectedIdx=2;
+        break;
+    default:
+        selectedIdx=2;
+        break;
+    }
+    ui->selectAlgorithm->setCurrentIndex(selectedIdx);
 }
 
 #endif

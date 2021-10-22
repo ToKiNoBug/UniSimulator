@@ -83,7 +83,10 @@ private:
     void buildMotionEnergyUI();
     void buildPathUI();
     void buildParameterUI();
-    void setRandomParameters();
+    void setParamaters(const BodyVector & mass,
+                                    const Statue & y0,
+                                    TimeSpan ts,double step,
+                                    Simulator::Algorithm);
 
     static QChart * createEmptyChart();
 
