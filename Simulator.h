@@ -76,13 +76,13 @@ public:
 
     const std::list<Point> & getResult() const;
 
-    double calculateKinetic(const Point*) const;
+    double calculateKinetic(const Statue & it) const;
 
-    double calculatePotential(const Point* it) const;
+    double calculatePotential(const Statue & it) const;
 
-    double calculateEnergy(const Point* it) const;
+    double calculateEnergy(const Statue & it) const;
 
-    void calculateTotalMotion(const Point* it,
+    void calculateTotalMotion(const Statue & it,
                                                 DimVector &) const;
 
 
@@ -113,6 +113,10 @@ public:
                           const Eigen::ArrayXd & timeQueried);
     static void motionAlign(const BodyVector & mass, Velocity & velocity);
     static void positonAlign(Position &);
+
+#ifdef BODY3_DIM3
+    static void positionShrink(Position &);
+#endif
 private:
     std::list<Point> sol;
 

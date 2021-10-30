@@ -25,17 +25,6 @@ This file is part of ThreeBodySimulation.
 
 #include "Simulator.h"
 
-#if (BODY_COUNT==2) && (DIM_COUNT==2)
-#define TEST_BODY2DIM2
-#endif
-
-#if (BODY_COUNT==2) && (DIM_COUNT==3)
-#define TEST_BODY2DIM3
-#endif
-
-#if (BODY_COUNT==3) && (DIM_COUNT==3)
-#define TEST_BODY3DIM3
-#endif
 
 void dispConstants();
 

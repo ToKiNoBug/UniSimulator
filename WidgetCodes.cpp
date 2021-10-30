@@ -114,9 +114,9 @@ void MainWindow::drawConservativeCharts() {
     for(auto it=result->cbegin();it!=result->cend();it++) {
         double yearTime=it->first/year;
         energyHead.push_back(QPointF(yearTime,
-                                 Simu.calculateEnergy(&*it)));
+                                 Simu.calculateEnergy(it->second)));
         DimVector motionVal;
-        Simu.calculateTotalMotion(&*it,motionVal);
+        Simu.calculateTotalMotion(it->second,motionVal);
         for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
             motions[dim].push_back(QPointF(yearTime,motionVal[dim]));
         }
@@ -395,6 +395,13 @@ QPointF MainWindow::moveScatterIndex(QChart * chart, int index) {
 
 void MainWindow::buildParameterUI() {
 
+    connect(ui->inputBeginTime,&QLineEdit::textChanged,
+            this,&MainWindow::onUserInput);
+    connect(ui->inputEndTime,&QLineEdit::textChanged,
+            this,&MainWindow::onUserInput);
+    connect(ui->inputStep,&QLineEdit::textChanged,
+            this,&MainWindow::onUserInput);
+
     ui->massBox->setTitle("Mass ( Ms="+QString::number(Ms)+"kg )");
     for(uint32_t body=0;body<BODY_COUNT;body++) {
         QLabel * curLabel=new QLabel;
@@ -403,6 +410,8 @@ void MainWindow::buildParameterUI() {
         QLineEdit * curWidget=new QLineEdit;
         massWidgets[body]=curWidget;
         ui->massArea->addWidget(curWidget,0,2*body+1);
+        connect(curWidget,&QLineEdit::textChanged,
+                this,&MainWindow::onUserInput);
     }
 
     ui->positionBox->setTitle("Position ( rs="+QString::number(rs)+"m )");
@@ -411,6 +420,8 @@ void MainWindow::buildParameterUI() {
             QLineEdit * curWidget=new QLineEdit;
             ui->positionArea->addWidget(curWidget,dim,body);
             positionWidgets[dim][body]=curWidget;
+            connect(curWidget,&QLineEdit::textChanged,
+                    this,&MainWindow::onUserInput);
         }
     }
 
@@ -420,6 +431,8 @@ void MainWindow::buildParameterUI() {
             QLineEdit * curWidget=new QLineEdit;
             ui->velocityArea->addWidget(curWidget,dim,body);
             velocityWidgets[dim][body]=curWidget;
+            connect(curWidget,&QLineEdit::textChanged,
+                    this,&MainWindow::onUserInput);
         }
     }
 
@@ -473,4 +486,82 @@ void MainWindow::setParamaters(const BodyVector & mass,
     ui->selectAlgorithm->setCurrentIndex(selectedIdx);
 }
 
+
+bool MainWindow::grabParameters(BodyVector &mass,
+                                Statue &y0,
+                                TimeSpan &ts,
+                                double &step,
+                                Simulator::Algorithm & algo) {
+    bool ok=true;
+    for(uint32_t body=0;body<BODY_COUNT;body++) {
+        mass[body]=Ms*this->massWidgets[body]->text().toDouble(&ok);
+        if(!ok) return false;
+        for(uint16_t dim=0;dim<DIM_COUNT;dim++) {
+            y0.first(dim,body)=rs*this->positionWidgets[dim][body]->text().toDouble(&ok);
+            if(!ok) return false;
+
+            y0.second(dim,body)=vs*this->velocityWidgets[dim][body]->text().toDouble(&ok);
+            if(!ok) return false;
+        }
+    }
+
+    ts.first=year*ui->inputBeginTime->text().toDouble(&ok);
+    if(!ok) return false;
+    ts.second=year*ui->inputEndTime->text().toDouble(&ok);
+    if(!ok) return false;
+    step=year*ui->inputStep->text().toDouble(&ok);
+    if(!ok) return false;
+    algo=Simulator::Algorithm(ui->selectAlgorithm->currentData().toInt(&ok));
+
+    return ok;
+}
+
+void MainWindow::onUserInput() {
+    double step;
+    TimeSpan ts;
+    Statue y0;
+    BodyVector mass;
+    Simulator::Algorithm algo;
+
+    bool ok=grabParameters(mass,y0,ts,step,algo);
+    ui->BtnRunSimulation->setEnabled(ok);
+}
+
+
+void MainWindow::on_BtnRunSimulation_clicked() {
+    double step;
+    TimeSpan ts;
+    Statue y0;
+    BodyVector mass;
+    Simulator::Algorithm algo;
+
+    bool ok=grabParameters(mass,y0,ts,step,algo);
+    if(!ok) return;
+    std::cerr<<"mass=\n"<<mass/Ms<<std::endl;
+    std::cerr<<"position=\n"<<y0.first/rs<<std::endl;
+    std::cerr<<"velocity=\n"<<y0.second/vs<<std::endl;
+    std::cerr<<"time span=["<<ts.first/year<<" , "<<ts.second/year<<"]\n";
+    std::cerr<<"time step="<<step/year<<std::endl;
+    std::cerr<<"algo : ";
+    switch (algo) {
+    case Simulator::Algorithm::Euler:
+        std::cerr<<"Euler\n";
+        break;
+    case Simulator::Algorithm::RK4Fixed:
+        std::cerr<<"RK4Fixed\n";
+        break;
+    case Simulator::Algorithm::RK4Var1:
+        std::cerr<<"RK4Var1\n";
+        break;
+    default:
+        std::cerr<<"Unknown algorithm, use RK4Var1 as default\n";
+        algo=Simulator::Algorithm::RK4Var1;
+        break;
+    }
+
+    runSimulaton(algo,step,ts,y0,mass);
+    drawConservativeCharts();
+    drawPathCharts();
+
+}
 #endif

@@ -37,20 +37,14 @@ int main(int argc, char *argv[])
     w.show();
 #ifdef TEST_BODY2DIM2
     w.runSimulaton(Simulator::Algorithm::RK4Var1);
-    w.drawConservativeCharts();
-    w.drawPathCharts();
 #endif
 
 #ifdef TEST_BODY2DIM3
     w.runSimulaton(Simulator::Algorithm::RK4Fixed);
-    w.drawConservativeCharts();
-    w.drawPathCharts();
 #endif
 
 #ifdef TEST_BODY3DIM3
     w.runSimulaton(Simulator::Algorithm::RK4Var1);
-    w.drawConservativeCharts();
-    w.drawPathCharts();
 #endif
 
     return a.exec();

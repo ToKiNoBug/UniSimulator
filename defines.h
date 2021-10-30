@@ -61,6 +61,19 @@ typedef std::pair<Time,Time> TimeSpan ;
 typedef  std::pair<Time,Statue> Point ;
 
 
+#if (BODY_COUNT==2) && (DIM_COUNT==2)
+#define TEST_BODY2DIM2
+#endif
+
+#if (BODY_COUNT==2) && (DIM_COUNT==3)
+#define TEST_BODY2DIM3
+#endif
+
+#if (BODY_COUNT==3) && (DIM_COUNT==3)
+#define BODY3_DIM3
+#define TEST_BODY3DIM3
+#endif
+
 #if DIM_COUNT <=0
 Error : DIM_COUNT_should_be_a_positive_integer
 #endif

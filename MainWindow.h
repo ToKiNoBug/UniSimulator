@@ -69,6 +69,10 @@ private slots:
 
     void on_cbShowDots_stateChanged(int arg1);
 
+    void onUserInput();
+
+    void on_BtnRunSimulation_clicked();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;
@@ -85,8 +89,14 @@ private:
     void buildParameterUI();
     void setParamaters(const BodyVector & mass,
                                     const Statue & y0,
-                                    TimeSpan ts,double step,
+                                    TimeSpan ts,
+                                    double step,
                                     Simulator::Algorithm);
+    bool grabParameters(BodyVector & mass,
+                        Statue & y0,
+                        TimeSpan & ts,
+                        double & step,
+                        Simulator::Algorithm&);
 
     static QChart * createEmptyChart();
 

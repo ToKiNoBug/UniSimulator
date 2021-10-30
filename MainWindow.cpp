@@ -130,7 +130,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
 
 #endif
     setParamaters(mass,start,tSpan,step,algo);
-    runSimulaton(algo,step,tSpan,start,mass);
+    on_BtnRunSimulation_clicked();
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo,
@@ -177,8 +177,6 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     ui->timeSlider->setMinimum(0);
     ui->timeSlider->setMaximum(dotCount-1);
 }
-
-
 
 void MainWindow::on_timeSlider_valueChanged(int value) {
 

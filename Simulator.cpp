@@ -418,9 +418,9 @@ const std::list<Point> & Simulator::getResult() const {
     return sol;
 }
 
-double Simulator::calculateKinetic(const Point* it) const {
+double Simulator::calculateKinetic(const Statue & it) const {
     Eigen::Tensor<double,1> speedSquare
-            =it->second.second.square().sum(Eigen::array<int,1>({0}));
+            =it.second.square().sum(Eigen::array<int,1>({0}));
     BodyVector v;
     for(uint16_t i=0;i<BODY_COUNT;i++) {
         v(i)=speedSquare(i)/2;
@@ -429,12 +429,12 @@ double Simulator::calculateKinetic(const Point* it) const {
     return (v*mass).sum();
 }
 
-double Simulator::calculatePotential(const Point* it) const {
+double Simulator::calculatePotential(const Statue & it) const {
     DistanceMat realDistance;
 
     realDistance.setZero();
 
-    const auto & pos=it->second.first;
+    const auto & pos=it.first;
 
     for(uint16_t i=0;i<BODY_COUNT;i++) {
         for(uint16_t j=i+1;j<BODY_COUNT;j++) {
@@ -454,16 +454,16 @@ double Simulator::calculatePotential(const Point* it) const {
     return realDistance.sum()/2;
 }
 
-double Simulator::calculateEnergy(const Point* it) const {
+double Simulator::calculateEnergy(const Statue & it) const {
     return calculateKinetic(it)+calculatePotential(it);
 }
 
-void Simulator::calculateTotalMotion(const Point* it,
+void Simulator::calculateTotalMotion(const Statue & it,
                           DimVector & dest) const {
 Eigen::Array<double,DIM_COUNT,BODY_COUNT> speed;
 for(uint16_t dim=0;dim<DIM_COUNT;dim++)
     for(uint16_t body=0;body<BODY_COUNT;body++) {
-        speed(dim,body)=it->second.second(dim,body);
+        speed(dim,body)=it.second(dim,body);
     }
 
 speed.rowwise()*=mass.transpose();
