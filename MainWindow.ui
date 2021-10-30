@@ -73,7 +73,47 @@
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="3" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0" rowspan="2">
+          <item row="2" column="1" rowspan="2">
+           <widget class="QPushButton" name="BtnRunSimulation">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Run
+Simulation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="BtnRandom">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Random</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="BtnClear">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Clear</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="4">
            <widget class="QGroupBox" name="timeBox">
             <property name="title">
              <string>Time (year=)</string>
@@ -141,20 +181,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="0" column="1" rowspan="2">
-           <widget class="QPushButton" name="BtnRunSimulation">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Run
-Simulation</string>
-            </property>
            </widget>
           </item>
          </layout>
@@ -257,7 +283,7 @@ Simulation</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
