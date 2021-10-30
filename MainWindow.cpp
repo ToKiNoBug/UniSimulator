@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
    setWindowTitle(QString::number(BODY_COUNT)+" Bodies in "
                   +QString::number(DIM_COUNT)
                   +"D Space Simulation    Made by TokiNoBug");
-
+    isRunning=false;
 }
 
 MainWindow::~MainWindow() {
@@ -127,10 +127,10 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo) {
     TimeSpan tSpan=std::make_pair(0*year,100*year);
 
     Time step=1e-4*year;
-
-#endif
     setParamaters(mass,start,tSpan,step,algo);
     on_BtnRunSimulation_clicked();
+
+#endif
 }
 
 void MainWindow::runSimulaton(Simulator::Algorithm algo,
@@ -139,6 +139,7 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
                                                        const Statue & s,
                                                        const BodyVector & mv,
                                                        bool * noCollide) {
+    isRunning=true;
     Simulator fast=Simu;
 
     fast.setMass(mv);
@@ -176,9 +177,13 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     std::cerr<<"curve displayed with "<<dotCount<<" dots\n";
     ui->timeSlider->setMinimum(0);
     ui->timeSlider->setMaximum(dotCount-1);
+
+    isRunning=false;
 }
 
 void MainWindow::on_timeSlider_valueChanged(int value) {
+
+    if(isRunning) return;
 
     //std::cerr<<"value="<<value<<std::endl;
     for(auto it : pathViews) {

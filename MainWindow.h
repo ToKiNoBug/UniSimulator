@@ -26,6 +26,7 @@ This file is part of ThreeBodySimulation.
 #include <QMainWindow>
 #include <QtCharts>
 #include <stack>
+#include <QKeyEvent>
 #include "Simulator.h"
 
 #include "tests.h"
@@ -73,6 +74,10 @@ private slots:
 
     void on_BtnRunSimulation_clicked();
 
+    void on_BtnClear_clicked();
+
+    void on_BtnRandom_clicked();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;
@@ -84,6 +89,9 @@ private:
     std::array<std::array<QLineEdit*,BODY_COUNT>,DIM_COUNT> positionWidgets;
     std::array<std::array<QLineEdit*,BODY_COUNT>,DIM_COUNT> velocityWidgets;
 
+    bool isRunning;
+
+private:
     void buildMotionEnergyUI();
     void buildPathUI();
     void buildParameterUI();
@@ -97,9 +105,10 @@ private:
                         TimeSpan & ts,
                         double & step,
                         Simulator::Algorithm&);
+    void keyPressEvent(QKeyEvent *event);
 
+public:
     static QChart * createEmptyChart();
-
     static void addSeriesToChart(QChart *,QList<QVector<QPointF>>&,
                                  int * =nullptr);
     static void createScatters(QChart*);

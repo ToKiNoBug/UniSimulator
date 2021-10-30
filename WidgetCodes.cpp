@@ -558,10 +558,102 @@ void MainWindow::on_BtnRunSimulation_clicked() {
         algo=Simulator::Algorithm::RK4Var1;
         break;
     }
-
-    runSimulaton(algo,step,ts,y0,mass);
+    bool noCollide=true;
+    runSimulaton(algo,step,ts,y0,mass,&noCollide);
     drawConservativeCharts();
     drawPathCharts();
 
+    QString title=QString::number(BODY_COUNT)+" Bodies in "
+            +QString::number(DIM_COUNT)
+            +"D Space Simulation    Made by TokiNoBug";
+    if(!noCollide) {
+        title+=" | Stars will Collide at "
+                +QString::number(Simu.getResult().back().first/year)
+                +" year(s)";
+    }
+    this->setWindowTitle(title);
+
+    ui->tabWidget->setCurrentIndex(1);
+}
+
+
+void MainWindow::on_BtnClear_clicked() {
+for(auto it : massWidgets) {
+    it->clear();
+}
+for(auto & it : positionWidgets) {
+    for(auto jt : it) {
+        jt->clear();
+    }
+}
+for(auto & it : velocityWidgets) {
+    for(auto jt : it) {
+        jt->clear();
+    }
+}
+
+ui->inputBeginTime->setText(QString::number(0));
+ui->inputEndTime->setText(QString::number(100));
+ui->inputStep->setText(QString::number(0.0001));
+
+ui->selectAlgorithm->setCurrentIndex(2);
+
+}
+
+
+void MainWindow::on_BtnRandom_clicked() {
+    BodyVector mass;
+    Statue start;
+
+    mass.setRandom();
+
+    auto abs=5*mass.abs();
+    abs.eval();
+    mass=abs*Ms;
+
+
+    Position rnd;
+    rnd.setRandom();
+    for(uint32_t i=0;i<rnd.size();i++){
+        rnd(i)=2*(rnd(i)-0.5);
+    }
+    auto temp1=rnd*(10*rs);
+    start.first=temp1;
+
+    rnd.setRandom();
+    for(uint32_t i=0;i<rnd.size();i++){
+        rnd(i)=2*(rnd(i)-0.5);
+    }
+
+
+
+    auto temp2=(rnd)*(vs);
+    start.second=temp2;
+    TimeSpan tSpan=std::make_pair(0*year,100*year);
+
+    Time step=1e-4*year;
+
+    Simulator::Algorithm algo=Simulator::Algorithm::RK4Var1;
+
+
+    setParamaters(mass,start,tSpan,step,algo);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    QWidget::keyPressEvent(event);
+    if(event->key()==Qt::Key::Key_F5) {
+        QPixmap pixmap=this->grab();
+
+        QString path;
+        path=QFileDialog::getSaveFileName(this,
+                                          "Save screenshot to image",
+                                          "",
+                                          "*.png"
+                                          );
+        if(path.isEmpty()) {
+            return;
+        }
+        pixmap.save(path);
+    }
 }
 #endif
