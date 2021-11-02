@@ -656,4 +656,55 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         pixmap.save(path);
     }
 }
+
+void MainWindow::saveParameters() {
+    Statue start;
+    TimeSpan ts;
+    BodyVector mass;
+    double step;
+    Simulator::Algorithm algo;
+    bool ok=
+            grabParameters(mass,start,ts,step,algo);
+
+    if(!ok) {
+        return;
+    }
+
+    QString fileName=QFileDialog::getSaveFileName(this,
+                                                  "Save parameters to file",
+                                                  "",
+                                                  "*"+QString::fromStdString(Simulator::paraSuffix));
+    if(fileName.isEmpty()) {
+        return;
+    }
+
+    Simulator::saveParameters(fileName.toLocal8Bit(),mass,start,ts,step);
+
+}
+
+void MainWindow::loadParameters() {
+
+    Statue start;
+    TimeSpan ts;
+    BodyVector mass;
+    double step;
+
+    QString fileName=QFileDialog::getOpenFileName(this,
+                                                  "Load parameters from file",
+                                                  "",
+                                                  "*"+QString::fromStdString(Simulator::paraSuffix));
+
+    if(fileName.isEmpty()) {
+        return;
+    }
+
+    bool ok=Simulator::loadParameters(fileName.toLocal8Bit(),mass,start,ts,step);
+
+    if(!ok) {
+        std::cerr<<"Failed to load parameters\n";
+        return;
+    }
+
+    setParamaters(mass,start,ts,step,Simulator::Algorithm::RK4Var1);
+}
 #endif

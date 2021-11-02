@@ -28,7 +28,8 @@ This file is part of ThreeBodySimulation.
 #include <list>
 #include <vector>
 #include <tuple>
-
+#include <fstream>
+#include <string>
 
 #include "defines.h"
 
@@ -52,7 +53,9 @@ public:
         RK4Var1,
         //ODE45
     };
-
+    static const std::string paraSuffix;
+    static const std::string dataSuffix;
+public:
     void simulateEuler(const double,
                        TimeSpan,
                        Statue,
@@ -85,7 +88,9 @@ public:
     void calculateTotalMotion(const Statue & it,
                                                 DimVector &) const;
 
+    void savePath(const char * fileName);
 
+public:
     static void calculateSafeDistance(const BodyVector &,
                                                             DistanceMat & dest);
 
@@ -113,6 +118,16 @@ public:
                           const Eigen::ArrayXd & timeQueried);
     static void motionAlign(const BodyVector & mass, Velocity & velocity);
     static void positonAlign(Position &);
+    static void saveParameters(const char * fileName,
+                               const BodyVector & mass,
+                               const Statue & y0,
+                               const TimeSpan ts,
+                               const double step);
+    static bool loadParameters(const char * fileName,
+                               BodyVector & mass,
+                               Statue & y0,
+                               TimeSpan & ts,
+                               double & step);
 
 #ifdef BODY3_DIM3
     static void positionShrink(Position &);

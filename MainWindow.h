@@ -78,6 +78,9 @@ private slots:
 
     void on_BtnRandom_clicked();
 
+    void saveParameters();
+    void loadParameters();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;

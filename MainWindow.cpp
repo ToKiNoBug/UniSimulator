@@ -48,6 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
                   +QString::number(DIM_COUNT)
                   +"D Space Simulation    Made by TokiNoBug");
     isRunning=false;
+
+    connect(ui->actionSave_parameters,&QAction::triggered,
+            this,&MainWindow::saveParameters);
+    connect(ui->actionLoad_parameters,&QAction::triggered,
+            this,&MainWindow::loadParameters);
 }
 
 MainWindow::~MainWindow() {

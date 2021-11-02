@@ -34,6 +34,11 @@ const double vs=omega_s*rs;
 const double as=omega_s*vs;
 const double INF=1e300;
 
+const std::string Simulator::paraSuffix
+            =".paraD"+std::to_string(DIM_COUNT)+"B"+std::to_string(BODY_COUNT);
+const std::string Simulator::dataSuffix
+=".dataD"+std::to_string(DIM_COUNT)+"B"+std::to_string(BODY_COUNT);
+
 #ifdef IS_POINT_TUPLE
 const uint8_t tupleTimeIndex=0,
                                 tuplePositionIndex=1,
@@ -550,4 +555,103 @@ void Simulator::positonAlign(Position & pos) {
             pos(dim,body)-=meanPos;
         }
     }
+}
+
+void Simulator::saveParameters(const char * fileName,
+                               const BodyVector & mass,
+                               const Statue & y0,
+                               const TimeSpan ts,
+                               const double step) {
+    std::string FName=fileName;
+    if(FName.find_last_of(paraSuffix)==std::string::npos) {
+        std::cerr<<"The suffix of filename must be "<<paraSuffix<<std::endl;
+        return;
+    }
+
+    std::ofstream file(FName,
+                       std::ios::out|std::ios::binary);
+    if(!file) {
+        std::cerr<<"Failed to create file"<<FName<<std::endl;
+        return;
+    }
+
+    {
+        uint32_t dC=DIM_COUNT,bC=BODY_COUNT;
+        file.write((const char*)&dC,sizeof(dC));
+        file.write((const char*)&bC,sizeof(bC));
+        //write dim_count, then body_count in uint32
+    }
+    for(uint32_t body=0;body<BODY_COUNT;body++) {
+        file.write((const char*)&mass[body],sizeof(mass[body]));
+        //write mass
+    }
+
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            file.write((const char*)&(y0.first(dim,body)),sizeof(y0.first(dim,body)));
+            //write position in row major
+        }
+    }
+
+    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
+        for(uint32_t body=0;body<BODY_COUNT;body++) {
+            file.write((const char*)&(y0.second(dim,body)),sizeof(y0.second(dim,body)));
+            //write velocity in row major
+        }
+    }
+
+    file.write((const char*)&ts.first,sizeof(ts.first));
+    file.write((const char*)&step,sizeof(step));
+    file.write((const char*)&ts.second,sizeof(ts.second));
+
+    file.close();
+    std::cerr<<"parameters saved successfully\n";
+}
+
+bool Simulator::loadParameters(const char * fileName,
+                                BodyVector & mass,
+                                Statue & y0,
+                                TimeSpan & ts,
+                                double & step) {
+    std::string FName=fileName;
+    if(FName.find_last_of(paraSuffix)==std::string::npos) {
+        std::cerr<<"The suffix of filename must be "<<paraSuffix<<std::endl;
+        return false;
+    }
+
+    std::ifstream file(fileName,std::ios::in|std::ios::binary);
+    uint32_t dC,bC;
+    file.read((char*)&dC,sizeof(dC));
+    file.read((char*)&bC,sizeof(bC));
+    if(dC!=DIM_COUNT) {
+        std::cerr<<"Error! Data in this file is in "<<dC
+                <<" dimensional space but DIM_COUNT is "<<DIM_COUNT<<std::endl;
+        return false;
+    }
+    if(bC!=BODY_COUNT) {
+        std::cerr<<"Error! Data in this file has "<<dC
+                <<" bodies but BODY_COUNT is "<<DIM_COUNT<<std::endl;
+        return false;
+    }
+
+    //std::array<double,BODY_COUNT*DIM_COUNT> buffer;
+    double buffer[BODY_COUNT*DIM_COUNT];
+    file.read((char*)buffer,BODY_COUNT*sizeof(double));
+    mass=BodyVector::Map(buffer);
+
+    file.read((char*)buffer,sizeof(buffer));
+    for(uint32_t i=0;i<BODY_COUNT*DIM_COUNT;i++) {
+        y0.first(i)=buffer[i];
+    }
+    file.read((char*)buffer,sizeof(buffer));
+    for(uint32_t i=0;i<BODY_COUNT*DIM_COUNT;i++) {
+        y0.second(i)=buffer[i];
+    }
+
+    file.read((char*)buffer,3*sizeof(double));
+    ts.first=buffer[0];
+    step=buffer[1];
+    ts.second=buffer[2];
+
+    return true;
 }
