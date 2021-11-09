@@ -75,11 +75,11 @@ typedef  std::pair<Time,Statue> Point ;
 #endif
 
 #if DIM_COUNT <=0
-Error : DIM_COUNT_should_be_a_positive_integer
+#error DIM_COUNT should be a positive integer
 #endif
 
 #if BODY_COUNT <2
-Error : BODY_COUNT_should_be_a_positive_integer_not_less_than_2
+#error BODY_COUNT should be a positive integer not less than 2
 #endif
 
 
