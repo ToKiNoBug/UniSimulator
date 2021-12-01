@@ -10,6 +10,11 @@ INCLUDEPATH += D:/CppLibs/eigen-3.4.0
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+TARGET = UniSimulator.exe
+
+RC_ICONS = icon.ico
+
+
 SOURCES += \
     Simulator.cpp \
     WidgetCodes.cpp \
