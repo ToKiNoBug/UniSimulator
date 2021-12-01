@@ -581,24 +581,15 @@ void Simulator::saveParameters(const char * fileName,
         file.write((const char*)&bC,sizeof(bC));
         //write dim_count, then body_count in uint32
     }
-    for(uint32_t body=0;body<BODY_COUNT;body++) {
-        file.write((const char*)&mass[body],sizeof(mass[body]));
-        //write mass
-    }
 
-    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
-        for(uint32_t body=0;body<BODY_COUNT;body++) {
-            file.write((const char*)&(y0.first(dim,body)),sizeof(y0.first(dim,body)));
-            //write position in row major
-        }
-    }
+    //write mass
+    file.write((const char*)mass.data(),sizeof(mass));
 
-    for(uint32_t dim=0;dim<DIM_COUNT;dim++) {
-        for(uint32_t body=0;body<BODY_COUNT;body++) {
-            file.write((const char*)&(y0.second(dim,body)),sizeof(y0.second(dim,body)));
-            //write velocity in row major
-        }
-    }
+    //write position in row major
+    file.write((const char*)y0.first.data(),sizeof(double)*y0.first.size());
+
+    //write velocity in row major
+    file.write((const char*)y0.second.data(),sizeof(double)*y0.second.size());
 
     file.write((const char*)&ts.first,sizeof(ts.first));
     file.write((const char*)&step,sizeof(step));
@@ -639,14 +630,9 @@ bool Simulator::loadParameters(const char * fileName,
     file.read((char*)buffer,BODY_COUNT*sizeof(double));
     mass=BodyVector::Map(buffer);
 
-    file.read((char*)buffer,sizeof(buffer));
-    for(uint32_t i=0;i<BODY_COUNT*DIM_COUNT;i++) {
-        y0.first(i)=buffer[i];
-    }
-    file.read((char*)buffer,sizeof(buffer));
-    for(uint32_t i=0;i<BODY_COUNT*DIM_COUNT;i++) {
-        y0.second(i)=buffer[i];
-    }
+    file.read((char*)y0.first.data(),sizeof(double)*y0.first.size());
+
+    file.read((char*)y0.second.data(),sizeof(double)*y0.second.size());
 
     file.read((char*)buffer,3*sizeof(double));
     ts.first=buffer[0];
@@ -688,8 +674,10 @@ void Simulator::saveAsData(const char *fileName) const {
 
     for(const auto & it : sol) {
         file.write((const char * )&it.first,sizeof (double));
-        file.write((const char * )it.second.first.data(),sizeof(it.second.first));
-        file.write((const char * )it.second.second.data(),sizeof(it.second.second));
+        file.write((const char * )it.second.first.data(),
+                   sizeof(double)*it.second.first.size());
+        file.write((const char * )it.second.second.data(),
+                   sizeof(double)*it.second.first.size());
     }
 
     file.close();
@@ -723,18 +711,23 @@ bool Simulator::loadFromData(const char *fileName) {
     file.read((char * )mass.data(),sizeof(mass));
 
     //std::array<double,BODY_COUNT*DIM_COUNT> buffer;
-    double buffer[1];
+    double buffer[1+2*DIM_COUNT*BODY_COUNT];
+    //double buffer[1];
 
-    Position pos;
-    Velocity velo;
+    Eigen::TensorMap<Position>
+            pos(buffer+1,{DIM_COUNT,BODY_COUNT});
+    Eigen::TensorMap<Velocity>
+            velo(buffer+1+DIM_COUNT*BODY_COUNT,{DIM_COUNT,BODY_COUNT});
+    //Position pos;
+    //Velocity velo;
 
     while(true) {
         file.read((char * )buffer,sizeof(buffer));
         if(file.eof()) {
             break;
         }
-        file.read((char * )pos.data(),sizeof(pos));
-        file.read((char * )velo.data(),sizeof(velo));
+        //file.read((char * )pos.data(),sizeof(pos));
+        //file.read((char * )velo.data(),sizeof(velo));
 
         sol.emplace_back(std::make_pair(buffer[0],
                          std::make_pair(pos,velo))
