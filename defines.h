@@ -29,8 +29,8 @@ This file is part of ThreeBodySimulation.
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#define DIM_COUNT 3
-#define BODY_COUNT 3
+#define DIM_COUNT 4
+#define BODY_COUNT 4
 
 typedef Eigen::TensorFixedSize<double,
                         Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Position;

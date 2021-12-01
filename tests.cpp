@@ -218,12 +218,12 @@ void testEuler() {
     auto * sol=&S.getResult();
     for(auto it=sol->cbegin();it!=sol->cend();it++) {
         DimVector dv;
-        S.calculateTotalMotion(&*it,dv);
+        S.calculateTotalMotion(it->second,dv);
         std::cerr<<"\nmotion:["<<dv.transpose()<<"]\n";
 
         double kinetic,potential;
-        kinetic=S.calculateKinetic(&*it);
-        potential=S.calculatePotential(&*it);
+        kinetic=S.calculateKinetic(it->second);
+        potential=S.calculatePotential(it->second);
 
         std::cerr<<"Kinetic="<<kinetic<<" , Potential="<<potential<<std::endl;
         std::cerr<<"Energy="<<kinetic+potential<<std::endl;
@@ -264,12 +264,12 @@ void testRK4Fixed() {
     auto * sol=&S.getResult();
     for(auto it=sol->cbegin();it!=sol->cend();it++) {
         DimVector dv;
-        S.calculateTotalMotion(&*it,dv);
+        S.calculateTotalMotion(it->second,dv);
         std::cerr<<"\nmotion:["<<dv.transpose()<<"]\n";
 
         double kinetic,potential;
-        kinetic=S.calculateKinetic(&*it);
-        potential=S.calculatePotential(&*it);
+        kinetic=S.calculateKinetic(it->second);
+        potential=S.calculatePotential(it->second);
 
         std::cerr<<"Kinetic="<<kinetic<<" , Potential="<<potential<<std::endl;
         std::cerr<<"Energy="<<kinetic+potential<<std::endl;
