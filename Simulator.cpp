@@ -655,3 +655,92 @@ bool Simulator::loadParameters(const char * fileName,
 
     return true;
 }
+
+void Simulator::saveAsData(const char *fileName) const {
+    std::string FName=fileName;
+    if(FName.find_last_of(dataSuffix)==std::string::npos) {
+        std::cerr<<"The suffix of filename must be "<<dataSuffix<<std::endl;
+        return;
+    }
+
+    if(sol.empty()) {
+        std::cerr<<"This simulator object hasn't been run, no avaliable result to store."
+                <<std::endl;
+        return;
+    }
+
+    std::ofstream file(FName,
+                       std::ios::out|std::ios::binary);
+    if(!file) {
+        std::cerr<<"Failed to create file"<<FName<<std::endl;
+        return;
+    }
+    {
+        uint32_t dC=DIM_COUNT,bC=BODY_COUNT;
+        file.write((const char*)&dC,sizeof(dC));
+        file.write((const char*)&bC,sizeof(bC));
+        //write dim_count, then body_count in uint32
+    }
+    {
+        file.write((const char*)mass.data(),sizeof(mass));
+        //write mass
+    }
+
+    for(const auto & it : sol) {
+        file.write((const char * )&it.first,sizeof (double));
+        file.write((const char * )it.second.first.data(),sizeof(it.second.first));
+        file.write((const char * )it.second.second.data(),sizeof(it.second.second));
+    }
+
+    file.close();
+
+}
+
+bool Simulator::loadFromData(const char *fileName) {
+    std::string FName=fileName;
+    if(FName.find_last_of(paraSuffix)==std::string::npos) {
+        std::cerr<<"The suffix of filename must be "<<paraSuffix<<std::endl;
+        return false;
+    }
+
+    std::ifstream file(fileName,std::ios::in|std::ios::binary);
+    uint32_t dC,bC;
+    file.read((char*)&dC,sizeof(dC));
+    file.read((char*)&bC,sizeof(bC));
+    if(dC!=DIM_COUNT) {
+        std::cerr<<"Error! Data in this file is in "<<dC
+                <<" dimensional space but DIM_COUNT is "<<DIM_COUNT<<std::endl;
+        return false;
+    }
+    if(bC!=BODY_COUNT) {
+        std::cerr<<"Error! Data in this file has "<<dC
+                <<" bodies but BODY_COUNT is "<<DIM_COUNT<<std::endl;
+        return false;
+    }
+
+    clear();
+
+    file.read((char * )mass.data(),sizeof(mass));
+
+    //std::array<double,BODY_COUNT*DIM_COUNT> buffer;
+    double buffer[1];
+
+    Position pos;
+    Velocity velo;
+
+    while(true) {
+        file.read((char * )buffer,sizeof(buffer));
+        if(file.eof()) {
+            break;
+        }
+        file.read((char * )pos.data(),sizeof(pos));
+        file.read((char * )velo.data(),sizeof(velo));
+
+        sol.emplace_back(std::make_pair(buffer[0],
+                         std::make_pair(pos,velo))
+                );
+    }
+
+    file.close();
+    return true;
+}

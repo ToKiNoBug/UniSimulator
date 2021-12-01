@@ -53,6 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
             this,&MainWindow::saveParameters);
     connect(ui->actionLoad_parameters,&QAction::triggered,
             this,&MainWindow::loadParameters);
+    connect(ui->actionSave_path,&QAction::triggered,
+            this,&MainWindow::savePath);
+    connect(ui->actionLoad_path,&QAction::triggered,
+            this,&MainWindow::loadPath);
 }
 
 MainWindow::~MainWindow() {

@@ -128,6 +128,8 @@ public:
                                Statue & y0,
                                TimeSpan & ts,
                                double & step);
+    void saveAsData(const char * fileName) const;
+    bool loadFromData(const char * fileName);
 
 #ifdef BODY3_DIM3
     static void positionShrink(Position &);

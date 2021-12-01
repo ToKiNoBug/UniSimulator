@@ -295,6 +295,8 @@ Simulation</string>
     </property>
     <addaction name="actionSave_parameters"/>
     <addaction name="actionLoad_parameters"/>
+    <addaction name="actionSave_path"/>
+    <addaction name="actionLoad_path"/>
    </widget>
    <addaction name="menu_Save"/>
   </widget>
@@ -307,6 +309,16 @@ Simulation</string>
   <action name="actionLoad_parameters">
    <property name="text">
     <string>Load parameters</string>
+   </property>
+  </action>
+  <action name="actionSave_path">
+   <property name="text">
+    <string>Save path</string>
+   </property>
+  </action>
+  <action name="actionLoad_path">
+   <property name="text">
+    <string>Load path</string>
    </property>
   </action>
  </widget>

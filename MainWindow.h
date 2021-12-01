@@ -81,6 +81,9 @@ private slots:
     void saveParameters();
     void loadParameters();
 
+    void savePath();
+    void loadPath();
+
 private:
     Ui::MainWindow *ui;
     Simulator Simu;

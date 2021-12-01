@@ -707,4 +707,38 @@ void MainWindow::loadParameters() {
 
     setParamaters(mass,start,ts,step,Simulator::Algorithm::RK4Var1);
 }
+
+void MainWindow::savePath() {
+    QString fileName=QFileDialog::getSaveFileName(this,
+                                                  "Save parameters to file",
+                                                  "",
+                                                  "*"+QString::fromStdString(Simulator::dataSuffix));
+    if(fileName.isEmpty()) {
+        return;
+    }
+
+    Simu.saveAsData(fileName.toLocal8Bit().data());
+}
+
+void MainWindow::loadPath() {
+    QString fileName=QFileDialog::getOpenFileName(this,
+                                                  "Load parameters from file",
+                                                  "",
+                                                  "*"+QString::fromStdString(Simulator::dataSuffix));
+
+    if(fileName.isEmpty()) {
+        return;
+    }
+
+    Simu.loadFromData(fileName.toLocal8Bit().data());
+
+    drawConservativeCharts();
+    drawPathCharts();
+    const auto & sol=Simu.getResult();
+    setParamaters(Simu.getMass(),
+                  sol.front().second,
+                  std::make_pair(sol.front().first,sol.back().first),
+                  (sol.back().first-sol.front().first)/sol.size(),
+                  Simulator::Algorithm::RK4Var1);
+}
 #endif
