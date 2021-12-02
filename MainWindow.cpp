@@ -175,7 +175,9 @@ void MainWindow::runSimulaton(Simulator::Algorithm algo,
     double showBeg,showEnd;
     showBeg=ts.first;
     showEnd=std::min(ts.second,fast.getResult().back().first);
-    dotCount=std::max(512,int((showEnd-showBeg)*32/year));
+    dotCount=std::min(16384,
+                      std::max(512,
+                               int((showEnd-showBeg)*32/year)));
 
     Simulator::deval(&fast,&Simu,
                      Eigen::ArrayXd::LinSpaced(dotCount,showBeg,showEnd));
