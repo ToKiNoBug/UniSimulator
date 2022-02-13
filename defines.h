@@ -30,21 +30,21 @@ This file is part of UniSimulator.
 #include <unsupported/Eigen/CXX11/Tensor>
 
 #define DIM_COUNT 3
-#define BODY_COUNT 3
+#define BODY_COUNT 6
 
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Position;
+using Position=Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>>;
 
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Velocity;
+using Velocity=Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>>;
 
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>> Acceleration;
+using Acceleration=Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT>>;
 
-typedef Eigen::TensorFixedSize<double,
-                        Eigen::Sizes<DIM_COUNT,BODY_COUNT,BODY_COUNT>> Interaction;
+using Interaction=Eigen::TensorFixedSize<double,
+                        Eigen::Sizes<DIM_COUNT,BODY_COUNT,BODY_COUNT>>;
 
-typedef double Time ;
+using Time=double;
 
 typedef Eigen::Array<double,BODY_COUNT,1> BodyVector ;
 
